@@ -23,26 +23,30 @@ python-shell:
 	docker compose run worker \
 	  poetry run flask shell
 
-postgres.data.delete: clean
-	docker volume rm $(VOLUME)_postgres
-
-postgres.start:
-	docker compose up -d postgres
-	docker compose exec postgres \
-	  sh -c 'while ! nc -z postgres 5432; do sleep 0.1; done'
-
-migrations.blank: postgres.start
+# SQLite3 migrations (không cần PostgreSQL)
+migrations.blank:
 	docker compose run worker \
 	  poetry run flask db revision
 
-migrations.create: postgres.start
+migrations.create:
 	docker compose run worker \
 	  poetry run flask db migrate
 
-migrations.upgrade: postgres.start
+migrations.upgrade:
 	docker compose run worker \
 	  poetry run flask db upgrade
 
-migrations.heads: postgres.start
+migrations.heads:
 	docker compose run worker \
 	  poetry run flask db heads
+
+# Thêm target mới cho SQLite3
+sqlite.init:
+	docker compose run worker \
+	  poetry run flask db init
+
+sqlite.reset: clean
+	docker compose run worker \
+	  rm -f /srv/app.db || true
+	docker compose run worker \
+	  poetry run flask db upgrade

@@ -15,8 +15,7 @@ RUN apk add --update --no-cache \
       g++ \
       autoconf \
       automake \
-      build-base \
-      postgresql-dev
+      build-base
 
 # cryptography module incompatibility with PEP517
 # https://github.com/pyca/cryptography/issues/5771
