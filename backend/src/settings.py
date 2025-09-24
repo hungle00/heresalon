@@ -19,7 +19,7 @@ class Settings:
 
     # Database
     AES_SECRET_KEY = os.getenv('AES_SECRET_KEY', 'fake-aes-key')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///salon.db')
 
     # Celery
     CELERY_BROKER_URL = REDIS_URL
