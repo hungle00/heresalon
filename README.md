@@ -1,27 +1,92 @@
-# The React + Flask Template &middot; [![Version Badge](https://img.shields.io/badge/version-1.0.0-brightgreen)](#)
+# Salon Management System
 
-A React starter project with Flask backend that works with [Docker](https://www.docker.com), [Docker Compose](https://docs.docker.com/compose),
-and [Shipyard](https://shipyard.build) out of the box.
+A comprehensive salon management system with React frontend and Flask backend that supports multi-salon operations, staff management, appointment booking, and customer services.
 
-## Includes
+## 🛠 Tech Stack
 
-- [React](https://github.com/facebook/react) - JavaScript library for building user interfaces
-- [Material-UI](https://github.com/mui-org/material-ui) - React components for faster and simpler web development
-- [Flask](https://github.com/pallets/flask) - lightweight WSGI web application framework
-- [Jinja](https://github.com/pallets/jinja) + [Bootstrap](https://pythonhosted.org/Flask-Bootstrap) (from CDN)
-- [uWSGI](https://github.com/unbit/uwsgi) - entrypoint
-- [Celery](https://github.com/celery/celery) (with example heartbeat task configured) - distributed task queue
-- [Flask-SQLAlchemy](https://github.com/pallets/flask-sqlalchemy) - ORM toolkit
-- [LocalStack](https://github.com/localstack/localstack) - fully functional local AWS cloud stack
+### **Frontend**
+- [React 18](https://github.com/facebook/react) - JavaScript library for building user interfaces
+- [React Router DOM](https://github.com/remix-run/react-router) - Client-side routing
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [Yarn](https://yarnpkg.com/) - Package manager
 
-## Dependencies
+### **Backend**
+- [Flask 1.1.1](https://github.com/pallets/flask) - Lightweight WSGI web application framework
+- [SQLite3](https://www.sqlite.org/) - Lightweight database for development
+- [SQLAlchemy](https://github.com/pallets/flask-sqlalchemy) - ORM toolkit
+- [Flask-Migrate](https://github.com/miguelgrinberg/Flask-Migrate) - Database migrations
+- [Celery](https://github.com/celery/celery) - Distributed task queue
+- [Redis](https://redis.io/) - In-memory data structure store
+- [Poetry](https://python-poetry.org/) - Dependency management
 
-- [Docker](https://www.docker.com) & [Docker Compose](https://docs.docker.com/compose) - to build and run the app
-- [Make](https://www.gnu.org/software/make/manual/make.html) - to easily run commands needed for development
+## 🚀 Quick Start
 
-## Getting Started
+### **Prerequisites**
+- Node.js 16+ (for frontend)
+- Python 3.8+ (for backend)
+- Docker & Docker Compose (optional)
+- Yarn (package manager)
+- Poetry (Python dependency manager)
 
-- Run `make develop` at the root of this project.
-- Visit the app at http://localhost:3000.
-- Visit http://localhost:8080/api/v1/files to list objects in LocalStack s3 bucket.
-- Make your code changes! The app will reload whenever you save.
+### **Option 1: Docker Setup (Recommended)**
+
+1. **Clone the repository**:
+   ```bash
+   git clone <repository-url>
+   cd heresalon
+   ```
+
+2. **Start with Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access the application**:
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8080/api/
+   - Admin Interface: http://localhost:8080/admin/
+
+### **Option 2: Manual Setup**
+
+#### **Backend Setup**
+```bash
+cd backend
+poetry install
+poetry run python create_admin.py  # Create admin user
+poetry run flask db upgrade        # Run database migrations
+FLASK_APP=src.entry:flask_app poetry run flask run --port=8080
+```
+
+#### **Frontend Setup**
+```bash
+cd frontend
+yarn install
+yarn start
+```
+
+## 📚 Documentation
+
+- [Backend Documentation](./backend/README.md) - Detailed Flask backend API and admin interface
+- [Frontend Documentation](./frontend/README.md) - React frontend with Tailwind CSS
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Check the [troubleshooting section](#-troubleshooting)
+- Review the individual README files in `frontend/` and `backend/`
+- Check the console for error messages
+- Verify all services are running correctly
+
+**Built with ❤️ for modern salon management**
