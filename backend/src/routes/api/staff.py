@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from src.models import Staff
 from src.models.staff import Seniority
 
-blueprint = Blueprint('staff', __name__)
+blueprint = Blueprint('staff', __name__, url_prefix='/api')
 
 @blueprint.route('/staff/', methods=['GET'])
 def get_staff():

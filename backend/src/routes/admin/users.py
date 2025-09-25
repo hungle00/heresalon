@@ -1,16 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from src.models import User
 from src.models.user import UserRole
+from src.routes.admin_auth import admin_required
 
-user_bp = Blueprint('users', __name__, url_prefix='/admin')
+blueprint = Blueprint('users', __name__, url_prefix='/admin')
 
-@user_bp.route('/users/')
+@blueprint.route('/users/')
+@admin_required
 def users():
     """List all users"""
     users = User.list()
     return render_template('admin/users.html', users=users)
 
-@user_bp.route('/users/new/', methods=['GET', 'POST'])
+@blueprint.route('/users/new/', methods=['GET', 'POST'])
+@admin_required
 def new_user():
     """Create new user"""
     if request.method == 'POST':
@@ -22,19 +25,20 @@ def new_user():
                 role=UserRole.ADMIN if request.form.get('role') == 'admin' else UserRole.CUSTOMER
             )
             flash('User created successfully!', 'success')
-            return redirect(url_for('admin.users'))
+            return redirect(url_for('admin_users.users'))
         except Exception as e:
             flash(f'Error creating user: {str(e)}', 'error')
     
     return render_template('admin/user_form.html', user=None)
 
-@user_bp.route('/users/<int:user_id>/edit/', methods=['GET', 'POST'])
+@blueprint.route('/users/<int:user_id>/edit/', methods=['GET', 'POST'])
+@admin_required
 def edit_user(user_id):
     """Edit user"""
     user = User.get(id=user_id)
     if not user:
         flash('User not found!', 'error')
-        return redirect(url_for('admin.users'))
+        return redirect(url_for('admin_users.users'))
     
     if request.method == 'POST':
         try:
@@ -43,8 +47,8 @@ def edit_user(user_id):
             user.role = UserRole.ADMIN if request.form.get('role') == 'admin' else UserRole.CUSTOMER
             user.save()
             flash('User updated successfully!', 'success')
-            return redirect(url_for('admin.users'))
+            return redirect(url_for('admin_users.users'))
         except Exception as e:
             flash(f'Error updating user: {str(e)}', 'error')
     
-    return render_template('admin/user_form.html', user=user) 
+    return render_template('admin/user_form.html', user=user)

@@ -3,7 +3,7 @@ from src.models import Appointment
 from src.models.appointment import AppointmentStatus
 from datetime import datetime, date
 
-blueprint = Blueprint('appointments', __name__)
+blueprint = Blueprint('appointments', __name__, url_prefix='/api')
 
 @blueprint.route('/appointments/', methods=['GET'])
 def get_appointments():

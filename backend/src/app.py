@@ -25,19 +25,8 @@ class Application:
         self.flask_app = Flask(__name__, static_url_path='/static')
         self.flask_app.config.from_object(S)
 
-        # Register the admin routes
-        admin_routes = [
-            routes.admin.dashboard.dashboard_bp,
-            routes.admin.users.user_bp
-        ]
-        for route in admin_routes:
-            self.flask_app.register_blueprint(route)
-
-        # Register the api routes
-        self.flask_app.register_blueprint(routes.api_blueprint)
-
-        # Register the public routes
-        for blueprint in [routes.counter, routes.localstack]:
+        # Register all blueprints using the main_blueprints array
+        for blueprint in routes.main_blueprints:
             self.flask_app.register_blueprint(blueprint)
 
         # Init Celery
