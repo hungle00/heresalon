@@ -19,17 +19,17 @@ def index():
 
 @blueprint.route('/api/v1/reset/')
 def reset():
-    # Thay vì sử dụng Counter, trả về response đơn giản
+    # Instead of using Counter, return simple response
     return jsonify(response=0)
 
 
 @blueprint.route('/api/v1/')
 def api():
-    # Thay vì sử dụng Counter, sử dụng timestamp để tạo response
+    # Instead of using Counter, use timestamp to create response
     date = datetime.datetime.now()
     dateStr = date.strftime('%c')
     
-    # Tạo response không cần database
+    # Create response without database
     response = f'Flask server running on port 8080. Server is active, \
 most recently on {dateStr}.'
     
