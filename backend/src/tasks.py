@@ -40,7 +40,7 @@ class Tasks:
 
     @staticmethod
     def ping_once(amount):
-        # Thay vì increment Counter, chỉ log hoặc thực hiện task khác
+        # Instead of incrementing Counter, just log or perform other task
         print(f"Ping task executed with amount: {amount}")
-        # Có thể thêm logic khác ở đây nếu cần
+        # Can add other logic here if needed
         return f"Ping completed with amount: {amount}"
