@@ -1,6 +1,5 @@
 from celery import Celery
 
-from src.models import Counter
 from src.settings import Settings as S
 
 
@@ -41,5 +40,7 @@ class Tasks:
 
     @staticmethod
     def ping_once(amount):
-        for counter in Counter.list():
-            counter.increment(amount=amount)
+        # Thay vì increment Counter, chỉ log hoặc thực hiện task khác
+        print(f"Ping task executed with amount: {amount}")
+        # Có thể thêm logic khác ở đây nếu cần
+        return f"Ping completed with amount: {amount}"

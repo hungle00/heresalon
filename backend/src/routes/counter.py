@@ -3,10 +3,7 @@ from flask import (
     jsonify
 )
 
-from src.models import Counter
-
 import datetime
-
 
 blueprint = Blueprint('counter', __name__)
 
@@ -22,20 +19,18 @@ def index():
 
 @blueprint.route('/api/v1/reset/')
 def reset():
-    counter = Counter.get_create(label='Test')
-    counter.reset()
-    return jsonify(response=counter.count)
+    # Thay vì sử dụng Counter, trả về response đơn giản
+    return jsonify(response=0)
 
 
 @blueprint.route('/api/v1/')
 def api():
-    counter = Counter.get_create(label='Test')
-    counter.increment()
+    # Thay vì sử dụng Counter, sử dụng timestamp để tạo response
     date = datetime.datetime.now()
     dateStr = date.strftime('%c')
-    times = 'time' if counter.count == 1 else 'times'
-    response = RESPONSE_TEMPLATE.format(
-        count=counter.count,
-        times=times,
-        date=dateStr)
+    
+    # Tạo response không cần database
+    response = f'Flask server running on port 8080. Server is active, \
+most recently on {dateStr}.'
+    
     return jsonify(response=response)
