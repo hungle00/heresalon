@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template
 from src.models import User, Salon, Staff, Service, Appointment
 from src.models.appointment import AppointmentStatus
+from src.routes.admin_auth import admin_required
 
-dashboard_bp = Blueprint('admin', __name__, url_prefix='/admin')
+blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
-@dashboard_bp.route('/')
+@blueprint.route('/')
+@admin_required
 def dashboard():
     """Admin dashboard"""
     stats = {
@@ -15,4 +17,4 @@ def dashboard():
         'total_appointments': Appointment.query.count(),
         'pending_appointments': Appointment.query.filter_by(status=AppointmentStatus.PENDING).count()
     }
-    return render_template('admin/dashboard.html', stats=stats) 
+    return render_template('admin/dashboard.html', stats=stats)

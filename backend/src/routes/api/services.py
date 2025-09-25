@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from src.models import Service
 from src.models.service import ServiceType
 
-blueprint = Blueprint('services', __name__)
+blueprint = Blueprint('services', __name__, url_prefix='/api')
 
 @blueprint.route('/services/', methods=['GET'])
 def get_services():

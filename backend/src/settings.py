@@ -17,9 +17,13 @@ class Settings:
     REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
     REDIS_URL = f'redis://{REDIS_HOST}:6379'
 
-    # Database
+    # Flask
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')
+
+    # Database - Use absolute path to avoid confusion
     AES_SECRET_KEY = os.getenv('AES_SECRET_KEY', 'fake-aes-key')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'sqlite:///salon.db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f'sqlite:///{os.path.abspath("salon.db")}')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Celery
     CELERY_BROKER_URL = REDIS_URL
