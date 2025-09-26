@@ -4,7 +4,7 @@
 {% block page_title %}Services{% endblock %}
 
 {% block page_actions %}
-<a href="{{ url_for('admin.new_service') }}" class="btn btn-primary">
+<a href="#" class="btn btn-primary">
     <i class="fas fa-plus"></i> Add Service
 </a>
 {% endblock %}
@@ -44,8 +44,7 @@
                         </td>
                         <td>{{ service.description[:50] + '...' if service.description and service.description|length > 50 else service.description or 'N/A' }}</td>
                         <td>
-                            <a href="{{ url_for('admin.edit_service', service_id=service.id) }}" 
-                               class="btn btn-sm btn-outline-primary">
+                            <a href="#" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         </td>

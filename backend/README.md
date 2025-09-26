@@ -43,7 +43,7 @@ This Flask application includes 2 main components:
 
 3. **Create admin user**:
    ```bash
-   poetry run python create_admin.py
+   poetry run python run_seed.py
    ```
 
 4. **Run the application**:

@@ -4,7 +4,7 @@
 {% block page_title %}Staff{% endblock %}
 
 {% block page_actions %}
-<a href="{{ url_for('admin.new_staff') }}" class="btn btn-primary">
+<a href="#" class="btn btn-primary">
     <i class="fas fa-plus"></i> Add Staff
 </a>
 {% endblock %}
@@ -29,7 +29,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for member in staff %}
+                    {% for member in staff_members %}
                     <tr>
                         <td>{{ member.id }}</td>
                         <td>{{ member.name }}</td>
@@ -38,16 +38,13 @@
                         <td>{{ member.years_experience or 'N/A' }} years</td>
                         <td>
                             {% if member.rating %}
-                                {% for i in range(member.rating) %}
-                                    <i class="fas fa-star text-warning"></i>
-                                {% endfor %}
+                                {{ member.rating }}
                             {% else %}
                                 N/A
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{{ url_for('admin.edit_staff', staff_id=member.id) }}" 
-                               class="btn btn-sm btn-outline-primary">
+                            <a href="#" class="btn btn-sm btn-outline-primary">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                         </td>
