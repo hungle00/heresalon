@@ -57,25 +57,25 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if 'salons' in request.endpoint %}active{% endif %}" 
-                               href="{{ url_for('admin_dashboard.dashboard') }}">
+                               href="{{ url_for('admin_salons.salons') }}">
                                 <i class="fas fa-store"></i> Salons
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if 'staff' in request.endpoint %}active{% endif %}" 
-                               href="{{ url_for('admin_dashboard.dashboard') }}">
+                               href="{{ url_for('admin_staff.staff') }}">
                                 <i class="fas fa-user-tie"></i> Staff
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if 'services' in request.endpoint %}active{% endif %}" 
-                               href="{{ url_for('admin_dashboard.dashboard') }}">
+                               href="{{ url_for('admin_services.services') }}">
                                 <i class="fas fa-cogs"></i> Services
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if 'appointments' in request.endpoint %}active{% endif %}" 
-                               href="{{ url_for('admin_dashboard.dashboard') }}">
+                               href="{{ url_for('admin_salons.salons') }}">
                                 <i class="fas fa-calendar"></i> Appointments
                             </a>
                         </li>
