@@ -24,6 +24,7 @@ services:
       shipyard.route: '/api'
     build: 'backend'
     environment:
+      DATABASE_URL: 'postgres://heresalon:heresalon123@postgres/heresalon'
       DEV: ${DEV}
       FLASK_DEBUG: '1'
     volumes:
@@ -35,12 +36,26 @@ services:
       - '8080:8080'
     depends_on:
       - redis
+      - postgres
+
+  postgres:
+    image: 'postgres:9.6-alpine'
+    environment:
+      POSTGRES_USER: 'obscure-user'
+      POSTGRES_PASSWORD: 'obscure-password'
+      POSTGRES_DB: 'app'
+      PGDATA: '/var/lib/postgresql/data/pgdata'
+    volumes:
+      - 'postgres:/var/lib/postgresql/data'
+    ports:
+      - '5432'
 
   worker:
     labels:
       shipyard.init: 'poetry run flask db upgrade'
     build: 'backend'
     environment:
+      DATABASE_URL: 'postgres://heresalon:heresalon123@postgres/heresalon'
       DEV: ${DEV}
       FLASK_DEBUG: '1'
     command: '/entrypoints/worker.sh'
@@ -56,3 +71,6 @@ services:
     image: 'redis:5.0-alpine'
     ports:
       - '6379'
+
+volumes:
+  postgres:

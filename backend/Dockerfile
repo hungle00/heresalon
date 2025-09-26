@@ -15,6 +15,7 @@ RUN apk add --update --no-cache \
       g++ \
       autoconf \
       automake \
+      postgresql-dev \
       build-base
 
 # cryptography module incompatibility with PEP517
