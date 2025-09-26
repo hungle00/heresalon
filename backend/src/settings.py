@@ -22,7 +22,7 @@ class Settings:
 
     # Database - Use absolute path to avoid confusion
     AES_SECRET_KEY = os.getenv('AES_SECRET_KEY', 'fake-aes-key')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', f'sqlite:///{os.path.abspath("salon.db")}')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Celery
