@@ -8,16 +8,16 @@ function HomePage() {
       <div className="bg-gradient-to-r from-pink-500 to-orange-500 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Welcome to Salon Management
+            Welcome to Heresalon
           </h1>
           <p className="text-xl md:text-2xl mb-8">
             Professional salon services with expert staff
           </p>
           <Link 
-            to="/staff"
+            to="/salon"
             className="bg-white text-pink-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-100 transition duration-300"
           >
-            View Our Staff
+            View Our Salon
           </Link>
         </div>
       </div>
@@ -39,7 +39,7 @@ function HomePage() {
                 Professional hair cutting, styling, and coloring services by our expert stylists.
               </p>
               <Link 
-                to="/staff"
+                to="/salon"
                 className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition duration-300"
               >
                 Meet Our Stylists
@@ -58,7 +58,7 @@ function HomePage() {
                 Comprehensive beauty treatments including facials, manicures, and more.
               </p>
               <Link 
-                to="/staff"
+                to="/salon"
                 className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-300"
               >
                 View Specialists
@@ -77,7 +77,7 @@ function HomePage() {
                 Our experienced professionals are here to provide you with the best service.
               </p>
               <Link 
-                to="/staff"
+                to="/salon"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
               >
                 Meet the Team

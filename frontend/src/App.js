@@ -3,8 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 // Import pages
 import HomePage from './pages/HomePage';
-import StaffListPage from './pages/StaffListPage';
+import SalonPage from './pages/SalonPage';
 import StaffProfilePage from './pages/StaffProfilePage';
+import StaffCalendarPage from './pages/staffs/CalendarPage';
+import ProfileEditPage from './pages/staffs/ProfileEditPage';
+import BookingPage from './pages/BookingPage';
 
 function App() {
   return (
@@ -16,7 +19,7 @@ function App() {
             <div className="flex justify-between h-16">
               <div className="flex items-center">
                 <Link to="/" className="text-white text-xl font-bold">
-                  Salon Management
+                  Heresalon
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
@@ -27,10 +30,16 @@ function App() {
                   Home
                 </Link>
                 <Link 
-                  to="/staff" 
+                  to="/salon" 
                   className="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
-                  Staff
+                  Salon
+                </Link>
+                <Link 
+                  to="/staff/calendar" 
+                  className="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Calendar
                 </Link>
               </div>
             </div>
@@ -41,8 +50,11 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/staff" element={<StaffListPage />} />
+            <Route path="/salon" element={<SalonPage />} />
             <Route path="/staff/:id" element={<StaffProfilePage />} />
+            <Route path="/staff/:id/edit" element={<ProfileEditPage />} />
+            <Route path="/booking" element={<BookingPage />} />
+            <Route path="/staff/calendar" element={<StaffCalendarPage />} />
           </Routes>
         </main>
       </div>
