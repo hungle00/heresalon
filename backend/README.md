@@ -104,3 +104,67 @@ poetry run flask db upgrade
 poetry run flask db current
 ```
 
+
+## Authentication API
+### 1. Register User
+**POST** `/api/auth/register/`
+
+Register a new user account.
+
+**Request Body:**
+```json
+{
+    "email": "user@example.com",
+    "password": "password123",
+    "username": "username"
+}
+```
+
+**Response:**
+```json
+{
+    "message": "User registered successfully",
+    "token": "jwt_token_here",
+    "user": {
+        "id": 1,
+        "username": "user",
+        "email": "user@example.com",
+        "role": "customer",
+        "salon_id": null,
+        "created_at": "2024-12-19T10:00:00"
+    }
+}
+```
+
+### 2. Login User
+**POST** `/api/auth/login/`
+
+Login with email and password.
+
+**Request Body:**
+```json
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+```
+
+### 3. Get Current User
+**GET** `/api/auth/me/`
+
+Get current user information (requires authentication).
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+### 4. Refresh Token
+**POST** `/api/auth/refresh/`
+
+
+### 5. Change Password
+**POST** `/api/auth/change-password/`
+
+### 6. Logout
+**POST** `/api/auth/logout/`

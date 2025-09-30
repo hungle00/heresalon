@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.security import check_password_hash
 from src.models import User
 from src.models.user import UserRole
+from functools import wraps
 
 # Create blueprint for admin auth routes
 admin_auth_bp = Blueprint('admin_auth', __name__, url_prefix='/admin')
@@ -22,7 +23,7 @@ def login():
         
         if user and check_password_hash(user.password_hash, password):
             # Check admin role
-            if user.role == UserRole.ADMIN:
+            if user.role in [UserRole.ADMIN, UserRole.MANAGER]:
                 session['admin_id'] = user.id
                 session['admin_username'] = user.username
                 flash(f'Welcome {user.username}!', 'success')
@@ -100,15 +101,33 @@ def change_password():
     
     return render_template('auth/change_password.html')
 
-# Helper function to check admin login
 def admin_required(f):
-    """Decorator to require admin login"""
-    from functools import wraps
-    
+    """Decorator to require admin role only"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'admin_id' not in session:
             flash('Please login to access this page!', 'error')
             return redirect(url_for('admin_auth.login'))
+        
+        user = User.get(id=session['admin_id'])
+        if not user or user.role != UserRole.ADMIN:
+            flash('You do not have permission to access this page!', 'error')
+            return redirect(url_for('admin_dashboard.dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+def manager_or_admin_required(f):
+    """Decorator to require manager or admin role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_id' not in session:
+            flash('Please login to access this page!', 'error')
+            return redirect(url_for('admin_auth.login'))
+        
+        user = User.get(id=session['admin_id'])
+        if not user or user.role not in [UserRole.ADMIN, UserRole.MANAGER]:
+            flash('You do not have permission to access this page!', 'error')
+            return redirect(url_for('admin_dashboard.dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
