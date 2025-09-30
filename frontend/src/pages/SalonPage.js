@@ -45,13 +45,6 @@ function SalonPage() {
     }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price);
-  };
-
   const getServiceTypeLabel = (type) => {
     const typeLabels = {
       'Hair': 'Hair',
@@ -66,7 +59,7 @@ function SalonPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
         </div>
       </div>
     );
@@ -83,112 +76,119 @@ function SalonPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Services Section */}
-      <div className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      {/* Hero Section with Visual Image */}
+      <div className="mb-8 sm:mb-16">
+        <div className="relative h-64 sm:h-80 lg:h-96 rounded-lg overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1560066984-138dadb4c035?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80"
+            alt="Salon Interior"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+            <div className="text-center text-white px-4">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                Here Salon
+              </h1>
+              <p className="text-lg sm:text-xl mb-6">
+                Professional Beauty & Wellness Services
+              </p>
+              <Link
+                to="/booking"
+                className="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition duration-300 text-sm sm:text-base"
+              >
+                Book Appointment
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Services Section - Updated Layout */}
+      <div className="mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">
             Our Services
           </h2>
-          <p className="text-lg text-gray-600">
-            Professional beauty and wellness services tailored to your needs
+          <p className="text-base sm:text-lg text-gray-600 px-4">
+            Professional beauty and wellness services
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Updated Grid: 2 columns on mobile, 4 columns on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {services.map((service) => (
-            <div key={service.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+            <Link 
+              key={service.id} 
+              to={`/service/${service.id}`}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 group"
+            >
               <img 
                 src={service.image_url} 
                 alt={service.name}
-                className="w-full h-48 object-cover"
+                className="w-full h-32 sm:h-40 object-cover group-hover:scale-105 transition duration-300"
               />
-              <div className="p-6">
+              <div className="p-3 sm:p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-xl font-semibold text-gray-800">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2">
                     {service.name}
                   </h3>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                  <span className="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded-full ml-2 flex-shrink-0">
                     {getServiceTypeLabel(service.type)}
                   </span>
                 </div>
-                <p className="text-gray-600 mb-4">
-                  {service.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-bold text-blue-600">
-                    {formatPrice(service.price)}
-                  </span>
-                  <Link
-                    to={`/booking?service_id=${service.id}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-                  >
-                    Book Now
-                  </Link>
-                </div>
+                {/* Removed price and booking button - now just clickable card */}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
 
-      {/* Staff Section */}
+      {/* Hair Stylists Section - Updated Layout */}
       <div>
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Our Professional Staff
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">
+            Our Hair Stylists
           </h2>
-          <p className="text-lg text-gray-600">
-            Meet our experienced and talented team of beauty professionals
+          <p className="text-base sm:text-lg text-gray-600 px-4">
+            Meet our talented hair stylists
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Updated Grid: 2 columns on mobile, 4 columns on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {staff.map((member) => (
-            <div key={member.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+            <Link 
+              key={member.id} 
+              to={`/staff/${member.id}/`}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 group"
+            >
               <img 
                 src={member.image_url} 
                 alt={member.name}
-                className="w-full h-64 object-cover"
+                className="w-full h-32 sm:h-40 object-cover group-hover:scale-105 transition duration-300"
               />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  {member.name}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {member.role}
-                </p>
-                <div className="flex items-center mb-4">
-                  <div className="flex items-center">
-                    <span className="text-yellow-400 text-lg mr-1">⭐</span>
-                    <span className="font-semibold">{member.rating}</span>
-                  </div>
-                  <span className="text-gray-500 ml-2">
-                    ({member.years_experience} years experience)
+              <div className="p-3 sm:p-4">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2">
+                    {member.name}
+                  </h3>
+                  <span className="bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded-full ml-2 flex-shrink-0">
+                    {member.role}
                   </span>
                 </div>
-                <p className="text-gray-700 mb-6">
-                  {member.bio}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {member.specialties?.map((specialty, index) => (
-                    <span 
-                      key={index}
-                      className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full"
-                    >
-                      {specialty}
-                    </span>
-                  ))}
+                <div className="flex items-center mb-2">
+                  <div className="flex items-center">
+                    <span className="text-yellow-400 text-xs mr-1">⭐</span>
+                    <span className="font-semibold text-xs">{member.rating}</span>
+                  </div>
+                  <span className="text-gray-500 ml-2 text-xs">
+                    ({member.years_experience} years)
+                  </span>
                 </div>
-                
-                <Link 
-                  to={`/staff/${member.id}/`}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300 inline-block"
-                >
-                  View Profile
-                </Link>
+                {/* Removed bio and specialties for compact design */}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
