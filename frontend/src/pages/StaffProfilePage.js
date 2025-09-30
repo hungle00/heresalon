@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { mockStaff } from '../data/mockData';
 
 function StaffProfilePage() {
   const { id } = useParams();
@@ -8,41 +9,30 @@ function StaffProfilePage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchStaffProfile();
+    fetchStaff();
   }, [id]);
 
-  const fetchStaffProfile = async () => {
+  const fetchStaff = async () => {
     try {
       setLoading(true);
-      setError(null); // Clear any previous errors
+      setError(null);
+      
       const response = await fetch(`/api/staff/${id}/`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch staff profile');
+      if (response.ok) {
+        const staffData = await response.json();
+        setStaff(staffData);
+      } else {
+        throw new Error('Staff not found');
       }
-      const data = await response.json();
-      setStaff(data);
     } catch (err) {
       console.log('API fetch failed, using mock data:', err.message);
-      setError(null); // Clear error state when using mock data
-      // Mock data for development
-      const mockStaff = {
-        id: parseInt(id),
-        name: 'Sarah Johnson',
-        role: 'Senior Hair Stylist',
-        bio: 'With over 8 years of experience in hair styling and coloring, Sarah specializes in modern cuts and vibrant color techniques. She has trained with top stylists in New York and Paris.',
-        years_experience: 8,
-        seniority: 'Senior',
-        rating: 4.9,
-        specialties: ['Hair Coloring', 'Hair Cutting', 'Styling', 'Color Correction'],
-        image_url: 'https://via.placeholder.com/400x300?text=Sarah+Johnson',
-        services: [
-          { name: 'Hair Cut & Style', price: '$75', duration: '60 min' },
-          { name: 'Hair Coloring', price: '$120', duration: '90 min' },
-          { name: 'Highlights', price: '$150', duration: '120 min' },
-          { name: 'Color Correction', price: '$200', duration: '180 min' }
-        ]
-      };
-      setStaff(mockStaff);
+      // Use mock data as fallback
+      const mockStaffMember = mockStaff.find(s => s.id === parseInt(id));
+      if (mockStaffMember) {
+        setStaff(mockStaffMember);
+      } else {
+        setError('Staff not found');
+      }
     } finally {
       setLoading(false);
     }
@@ -52,27 +42,24 @@ function StaffProfilePage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
         </div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !staff) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
-        </div>
-      </div>
-    );
-  }
-
-  if (!staff) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          Staff member not found
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Staff Not Found</h1>
+          <p className="text-gray-600 mb-8">The staff member you're looking for doesn't exist.</p>
+          <Link
+            to="/salon"
+            className="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition duration-300"
+          >
+            Back to Salon
+          </Link>
         </div>
       </div>
     );
@@ -80,24 +67,24 @@ function StaffProfilePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Back Button and Action Buttons */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Back Button and Action Buttons - Mobile Optimized */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <Link 
           to="/salon"
-          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+          className="inline-flex items-center text-pink-600 hover:text-pink-800 text-sm sm:text-base"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to Staff
         </Link>
         
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <Link
             to={`/booking?staff_id=${id}`}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             Book Now
@@ -105,9 +92,9 @@ function StaffProfilePage() {
           
           <Link
             to={`/staff/${id}/edit`}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm sm:text-base"
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
             Edit Profile
@@ -122,77 +109,63 @@ function StaffProfilePage() {
             <img 
               src={staff.image_url} 
               alt={staff.name}
-              className="w-full h-64 object-cover"
+              className="w-full h-64 sm:h-80 object-cover"
             />
+            <div className="p-6">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+                {staff.name}
+              </h1>
+              <p className="text-lg text-gray-600 mb-4">
+                {staff.role}
+              </p>
+              <div className="flex items-center mb-4">
+                <div className="flex items-center">
+                  <span className="text-yellow-400 text-lg mr-1">⭐</span>
+                  <span className="font-semibold">{staff.rating}</span>
+                </div>
+                <span className="text-gray-500 ml-2">
+                  ({staff.years_experience} years experience)
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Profile Information */}
+        {/* Profile Details */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {staff.name}
-            </h1>
-            <p className="text-xl text-gray-600 mb-4">
-              {staff.role}
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">About</h2>
+            <p className="text-gray-600 leading-relaxed mb-6">
+              {staff.bio}
             </p>
             
-            <div className="flex items-center mb-6">
-              <div className="flex items-center">
-                <span className="text-2xl mr-2">⭐</span>
-                <span className="text-lg font-semibold">{staff.rating}/5.0</span>
-              </div>
-              <span className="text-gray-600 ml-4">
-                ({staff.years_experience} years experience)
-              </span>
-            </div>
-
-            <div className="border-t pt-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-3">
-                About {staff.name}
-              </h2>
-              <p className="text-gray-700 mb-6">
-                {staff.bio}
-              </p>
-
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                Specialties
-              </h3>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {staff.specialties.map((specialty) => (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Specialties</h3>
+              <div className="flex flex-wrap gap-2">
+                {staff.specialties?.map((specialty, index) => (
                   <span 
-                    key={specialty}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+                    key={index}
+                    className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm"
                   >
                     {specialty}
                   </span>
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Services Section */}
-      <div className="mt-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">
-            Services & Pricing
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {staff.services?.map((service, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-300">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                  {service.name}
-                </h3>
-                <p className="text-2xl font-bold text-blue-600 mb-1">
-                  {service.price}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {service.duration}
-                </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Experience</h3>
+                <p className="text-gray-600">{staff.years_experience} years</p>
               </div>
-            ))}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">Rating</h3>
+                <div className="flex items-center">
+                  <span className="text-yellow-400 text-lg mr-1">⭐</span>
+                  <span className="font-semibold">{staff.rating}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
