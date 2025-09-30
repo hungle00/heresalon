@@ -1,16 +1,22 @@
 from flask import Blueprint, jsonify, request
-from src.models import Staff
+from src.models import Staff, Salon
 from src.models.staff import Seniority
 
 blueprint = Blueprint('staff', __name__, url_prefix='/api')
 
-@blueprint.route('/staff/', methods=['GET'])
-def get_staff():
-    """Get all staff"""
-    staff = Staff.list()
+@blueprint.route('/salons/<int:salon_id>/staffs/', methods=['GET'])
+def get_salon_staff(salon_id):
+    """Get all staff for a specific salon"""
+    # Verify salon exists
+    salon = Salon.get(id=salon_id)
+    if not salon:
+        return jsonify({'error': 'Salon not found'}), 404
+    
+    # Get staff for the salon
+    staff = Staff.query.filter_by(salon_id=salon_id).all()
     return jsonify([member.to_dict() for member in staff])
 
-@blueprint.route('/staff/<int:staff_id>/', methods=['GET'])
+@blueprint.route('/staffs/<int:staff_id>/', methods=['GET'])
 def get_staff_member(staff_id):
     """Get staff member by ID"""
     staff = Staff.get(id=staff_id)
@@ -18,7 +24,7 @@ def get_staff_member(staff_id):
         return jsonify({'error': 'Staff member not found'}), 404
     return jsonify(staff.to_dict())
 
-@blueprint.route('/staff/<int:staff_id>/', methods=['PUT'])
+@blueprint.route('/staffs/<int:staff_id>/', methods=['PUT'])
 def update_staff(staff_id):
     """Update staff member"""
     staff = Staff.get(id=staff_id)

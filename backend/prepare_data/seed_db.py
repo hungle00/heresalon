@@ -9,7 +9,7 @@ import os
 import sys
 from decimal import Decimal
 from src.entry import flask_app
-from src.models import db, Salon, Staff, Service, StaffService, User
+from src.models import db, Salon, Staff, Service, SalonService, User
 from src.models.staff import StaffRole, Seniority
 from src.models.service import ServiceType
 from src.models.user import UserRole
@@ -24,14 +24,15 @@ def create_salon():
     if not salon:
         salon = Salon.create(
             name="Here Salon",
-            address="123 Beauty Street, District 1, Ho Chi Minh City"
+            address="123 Beauty Street, District 1, Ho Chi Minh City",
+            description="Premium nail salon offering professional nail care services including manicures, pedicures, gel polish, nail art, and spa treatments. Our experienced staff provides exceptional service in a relaxing environment."
         )
         print(f"✅ Created salon: {salon.name}")
     else:
         print(f"✅ Salon already exists: {salon.name}")
     return salon
 
-def create_admin_user():
+def create_admin():
     """Create admin user if it doesn't exist."""
     admin = User.query.filter_by(username="admin").first()
     if not admin:
@@ -45,6 +46,22 @@ def create_admin_user():
     else:
         print(f"✅ Admin user already exists: {admin.username}")
     return admin
+
+def create_manager(salon_id):
+    """Create manager user if it doesn't exist."""
+    manager = User.query.filter_by(username="manager").first()
+    if not manager:
+        manager = User.create(
+            username="manager",
+            email="manager@heresalon.com",
+            password_hash=generate_password_hash("manager123"),
+            role=UserRole.MANAGER,
+            salon_id=salon_id
+        )
+        print(f"✅ Created manager user: {manager.username} for salon ID: {salon_id}")
+    else:
+        print(f"✅ Manager user already exists: {manager.username}")
+    return manager
 
 def map_staff_data(staff_data, salon_id):
     """Map staff data from prepare_data.py to Staff model fields."""
@@ -154,43 +171,37 @@ def seed_services():
         except Exception as e:
             print(f"❌ Error creating service {service_data['name']}: {e}")
 
-def create_staff_service_relationships():
-    """Create relationships between staff and services based on can_do_services."""
-    print("\n🌱 Creating staff-service relationships...")
+def create_salon_service_relationships():
+    """Create relationships between salon and services."""
+    print("\n🌱 Creating salon-service relationships...")
     
-    for staff_data in staffs:
-        staff = Staff.query.filter_by(name=staff_data['name']).first()
-        if not staff:
+    # Get the salon
+    salon = Salon.query.filter_by(name="Here Salon").first()
+    if not salon:
+        print("❌ Salon not found")
+        return
+    
+    # Get all services
+    all_services = Service.query.all()
+    
+    for service in all_services:
+        # Check if relationship already exists
+        existing_relationship = SalonService.query.filter_by(
+            salon_id=salon.id,
+            service_id=service.id
+        ).first()
+        
+        if existing_relationship:
             continue
         
-        for service_id in staff_data.get('can_do_services', []):
-            # Find service by ID from prepare_data.py
-            service_data = next((s for s in services if s['id'] == service_id), None)
-            if not service_data:
-                continue
-            
-            # Find service in database
-            service = Service.query.filter_by(name=service_data['name']).first()
-            if not service:
-                continue
-            
-            # Check if relationship already exists
-            existing_relationship = StaffService.query.filter_by(
-                staff_id=staff.id,
+        try:
+            SalonService.create(
+                salon_id=salon.id,
                 service_id=service.id
-            ).first()
-            
-            if existing_relationship:
-                continue
-            
-            try:
-                StaffService.create(
-                    staff_id=staff.id,
-                    service_id=service.id
-                )
-                print(f"✅ Linked {staff.name} to {service.name}")
-            except Exception as e:
-                print(f"❌ Error linking {staff.name} to {service.name}: {e}")
+            )
+            print(f"✅ Linked {salon.name} to {service.name}")
+        except Exception as e:
+            print(f"❌ Error linking {salon.name} to {service.name}: {e}")
 
 def main():
     """Main seeding function."""
@@ -202,7 +213,10 @@ def main():
             salon = create_salon()
             
             # Create admin user
-            admin = create_admin_user()
+            admin = create_admin()
+            
+            # Create manager user for the salon
+            manager = create_manager(salon.id)
             
             # Seed staff data
             seed_staffs(salon.id)
@@ -210,16 +224,18 @@ def main():
             # Seed service data
             seed_services()
             
-            # Create staff-service relationships
-            create_staff_service_relationships()
+            # Create salon-service relationships
+            create_salon_service_relationships()
             
             print("\n🎉 Database seeding completed successfully!")
             print(f"📊 Summary:")
             print(f"   - Salons: {Salon.query.count()}")
             print(f"   - Staff: {Staff.query.count()}")
             print(f"   - Services: {Service.query.count()}")
-            print(f"   - Staff-Service relationships: {StaffService.query.count()}")
+            print(f"   - Salon-Service relationships: {SalonService.query.count()}")
             print(f"   - Users: {User.query.count()}")
+            print(f"   - Admin users: {User.query.filter_by(role=UserRole.ADMIN).count()}")
+            print(f"   - Manager users: {User.query.filter_by(role=UserRole.MANAGER).count()}")
             
         except Exception as e:
             print(f"❌ Error during seeding: {e}")

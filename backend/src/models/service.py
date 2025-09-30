@@ -22,7 +22,7 @@ class Service(BaseModel):
     image_url = db.Column(db.String(255), nullable=True)
 
     # Relationships
-    staff_services = db.relationship('StaffService', backref='service', lazy=True)
+    salon_services = db.relationship('SalonService', backref='service', lazy=True)
     appointments = db.relationship('Appointment', backref='service', lazy=True)
 
     def __repr__(self):
@@ -37,4 +37,4 @@ class Service(BaseModel):
             'type': self.type.value,
             'price': float(self.price) if self.price else None,
             'image_url': self.image_url
-        } 
+        }
