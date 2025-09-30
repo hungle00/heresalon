@@ -151,7 +151,7 @@ const ProfileEditPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading profile...</p>
         </div>
       </div>
@@ -193,7 +193,7 @@ const ProfileEditPage = () => {
                   type="text"
                   value={profile.name}
                   onChange={(e) => handleProfileChange('name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   required
                 />
               </div>
@@ -207,7 +207,7 @@ const ProfileEditPage = () => {
                   type="number"
                   value={profile.years_experience}
                   onChange={(e) => handleProfileChange('years_experience', parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   min="0"
                   max="50"
                 />
@@ -221,7 +221,7 @@ const ProfileEditPage = () => {
                 <select
                   value={profile.seniority}
                   onChange={(e) => handleProfileChange('seniority', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                 >
                   {seniorityOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -240,7 +240,7 @@ const ProfileEditPage = () => {
                   type="number"
                   value={profile.rating}
                   onChange={(e) => handleProfileChange('rating', parseFloat(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   min="1"
                   max="5"
                   step="0.1"
@@ -256,7 +256,7 @@ const ProfileEditPage = () => {
                   value={profile.bio}
                   onChange={(e) => handleProfileChange('bio', e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -270,7 +270,7 @@ const ProfileEditPage = () => {
                   type="text"
                   value={profile.specialties}
                   onChange={(e) => handleProfileChange('specialties', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   placeholder="e.g., Haircuts, Coloring, Styling"
                 />
               </div>
@@ -284,7 +284,7 @@ const ProfileEditPage = () => {
                   type="url"
                   value={profile.image_url}
                   onChange={(e) => handleProfileChange('image_url', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -304,7 +304,7 @@ const ProfileEditPage = () => {
                       id={day.key}
                       checked={workingHours[day.key].enabled}
                       onChange={(e) => handleWorkingHoursChange(day.key, 'enabled', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                     />
                     <label htmlFor={day.key} className="ml-2 text-sm font-medium text-gray-700 w-20">
                       {day.label}
@@ -319,7 +319,7 @@ const ProfileEditPage = () => {
                           type="time"
                           value={workingHours[day.key].start}
                           onChange={(e) => handleWorkingHoursChange(day.key, 'start', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-pink-500"
                         />
                       </div>
                       <span className="text-gray-400 mt-6">to</span>
@@ -329,7 +329,7 @@ const ProfileEditPage = () => {
                           type="time"
                           value={workingHours[day.key].end}
                           onChange={(e) => handleWorkingHoursChange(day.key, 'end', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-pink-500"
                         />
                       </div>
                     </div>
@@ -351,7 +351,7 @@ const ProfileEditPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
