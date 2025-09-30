@@ -3,9 +3,9 @@ import React from 'react';
 const Calendar = () => {
     return (
       <section className="relative bg-stone-50">
-        <div className="bg-sky-400 w-full sm:w-40 h-40 rounded-full absolute top-1 opacity-20 max-sm:right-0 sm:left-56 z-0"></div>
-        <div className="bg-emerald-500 w-full sm:w-40 h-24 absolute top-0 -left-0 opacity-20 z-0"></div>
-        <div className="bg-purple-600 w-full sm:w-40 h-24 absolute top-40 -left-0 opacity-20 z-0"></div>
+        <div className="bg-pink-400 w-full sm:w-40 h-40 rounded-full absolute top-1 opacity-20 max-sm:right-0 sm:left-56 z-0"></div>
+        <div className="bg-pink-500 w-full sm:w-40 h-24 absolute top-0 -left-0 opacity-20 z-0"></div>
+        <div className="bg-pink-600 w-full sm:w-40 h-24 absolute top-40 -left-0 opacity-20 z-0"></div>
         <div className="w-full py-24 relative z-10 backdrop-blur-3xl">
           <div className="w-full max-w-7xl mx-auto px-2 lg:px-8">
             <div className="grid grid-cols-12 gap-8 max-w-4xl mx-auto xl:max-w-full">
@@ -16,11 +16,11 @@ const Calendar = () => {
                   <div className="p-6 rounded-xl bg-white">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-pink-600"></span>
                         <p className="text-base font-medium text-gray-900">Jan 10,2020 - 10:00 - 11:00</p>
                       </div>
                       <div className="dropdown relative inline-flex">
-                        <button type="button" data-target="dropdown-default" className="dropdown-toggle inline-flex justify-center py-2.5 px-1 items-center gap-2 text-sm text-black rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:text-purple-600  ">
+                        <button type="button" data-target="dropdown-default" className="dropdown-toggle inline-flex justify-center py-2.5 px-1 items-center gap-2 text-sm text-black rounded-full cursor-pointer font-semibold text-center shadow-xs transition-all duration-500 hover:text-pink-600  ">
                           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="4" viewBox="0 0 12 4" fill="none">
                             <path d="M1.85624 2.00085H1.81458M6.0343 2.00085H5.99263M10.2124 2.00085H10.1707" stroke="currentcolor" stroke-width="2.5" stroke-linecap="round"></path>
                           </svg>
@@ -49,7 +49,7 @@ const Calendar = () => {
                   <div className="p-6 rounded-xl bg-white">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-pink-400"></span>
                         <p className="text-base font-medium text-gray-900">Jan 10,2020 - 05:40 - 13:00</p>
                       </div>
                       <div className="dropdown relative inline-flex">
@@ -82,7 +82,7 @@ const Calendar = () => {
                   <div className="p-6 rounded-xl bg-white">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2.5">
-                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-pink-600"></span>
                         <p className="text-base font-medium text-gray-900">Jan 14, 2020 10:00 - 11:00</p>
                       </div>
                       <div className="dropdown relative inline-flex">
@@ -171,10 +171,10 @@ const Calendar = () => {
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
                       <span className="text-xs font-semibold text-gray-900">3</span>
-                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-purple-50 ">
-                        <p className="hidden xl:block text-xs font-medium text-purple-600 mb-px">Meeting</p>
-                        <span className="hidden xl:block text-xs font-normal text-purple-600 whitespace-nowrap">10:00 - 11:00</span>
-                        <p className="xl:hidden w-2 h-2 rounded-full bg-purple-600"></p>
+                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-pink-50 ">
+                        <p className="hidden xl:block text-xs font-medium text-pink-600 mb-px">Meeting</p>
+                        <span className="hidden xl:block text-xs font-normal text-pink-600 whitespace-nowrap">10:00 - 11:00</span>
+                        <p className="xl:hidden w-2 h-2 rounded-full bg-pink-600"></p>
                       </div>
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
@@ -188,10 +188,10 @@ const Calendar = () => {
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white relative border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
                       <span className="text-xs font-semibold text-gray-900">7</span>
-                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-emerald-50 ">
+                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-pink-50 ">
                         <p className="hidden xl:block text-xs font-medium text-emerald-600 mb-px whitespace-nowrap">Developer Meetup</p>
                         <span className="hidden xl:block text-xs font-normal text-emerald-600 whitespace-nowrap">10:00 - 11:00</span>
-                        <p className="xl:hidden w-2 h-2 rounded-full bg-emerald-600"></p>
+                        <p className="xl:hidden w-2 h-2 rounded-full bg-pink-600"></p>
                       </div>
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
@@ -229,10 +229,10 @@ const Calendar = () => {
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
                       <span className="text-xs font-semibold text-gray-900">19</span>
-                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-sky-50 ">
+                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-pink-50 ">
                         <p className="hidden xl:block text-xs font-medium text-sky-600 mb-px whitespace-nowrap">Developer Meetup</p>
                         <span className="hidden xl:block text-xs font-normal text-sky-600 whitespace-nowrap">10:00 - 11:00</span>
-                        <p className="xl:hidden w-2 h-2 rounded-full bg-sky-600"></p>
+                        <p className="xl:hidden w-2 h-2 rounded-full bg-pink-600"></p>
                       </div>
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-white border-r border-b border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
@@ -282,10 +282,10 @@ const Calendar = () => {
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 relative bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">
                       <span className="text-xs font-semibold text-gray-400">4</span>
-                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-purple-50 ">
-                        <p className="hidden xl:block text-xs font-medium text-purple-600 mb-px whitespace-nowrap">Friends Meet</p>
-                        <span className="hidden xl:block text-xs font-normal text-purple-600 whitespace-nowrap">09:00 - 13:42</span>
-                        <p className="xl:hidden w-2 h-2 rounded-full bg-purple-600"></p>
+                      <div className="absolute top-9 bottom-1 left-3.5 p-1.5 xl:px-2.5 h-max rounded bg-pink-50 ">
+                        <p className="hidden xl:block text-xs font-medium text-pink-600 mb-px whitespace-nowrap">Friends Meet</p>
+                        <span className="hidden xl:block text-xs font-normal text-pink-600 whitespace-nowrap">09:00 - 13:42</span>
+                        <p className="xl:hidden w-2 h-2 rounded-full bg-pink-600"></p>
                       </div>
                     </div>
                     <div className="flex xl:aspect-square max-xl:min-h-[60px] p-3.5 bg-gray-50 border-r border-indigo-200 transition-all duration-300 hover:bg-indigo-50 cursor-pointer">

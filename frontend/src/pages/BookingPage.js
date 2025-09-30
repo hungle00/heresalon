@@ -275,7 +275,7 @@ const BookingPage = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading booking information...</p>
         </div>
       </div>
@@ -308,7 +308,7 @@ const BookingPage = () => {
           {/* Staff Information */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-4">
                 {staff ? 'Selected Staff' : 'Select Staff Member'}
               </h2>
               
@@ -320,7 +320,7 @@ const BookingPage = () => {
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{staff.name}</h3>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900">{staff.name}</h3>
                     <p className="text-gray-600">{staff.role}</p>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ const BookingPage = () => {
                   <select
                     value={booking.staff_id}
                     onChange={(e) => handleStaffChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     required
                   >
                     <option value="">Choose a staff member...</option>
@@ -346,10 +346,10 @@ const BookingPage = () => {
             {/* Selected Service */}
             {selectedService && (
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Selected Service</h2>
+                <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-4">Selected Service</h2>
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{selectedService.name}</h3>
-                  <p className="text-2xl font-bold text-blue-600 mt-2">${selectedService.price}</p>
+                  <h3 className="text-sm sm:text-lg font-semibold text-gray-900">{selectedService.name}</h3>
+                  <p className="text-lg sm:text-2xl font-bold text-pink-600 mt-2">${selectedService.price}</p>
                   <p className="text-gray-600">{selectedService.duration} minutes</p>
                 </div>
               </div>
@@ -359,7 +359,7 @@ const BookingPage = () => {
           {/* Booking Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Appointment Details</h2>
+              <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-6">Appointment Details</h2>
               
               <div className="space-y-6">
                 {/* Staff Selection (if no staff pre-selected) */}
@@ -371,7 +371,7 @@ const BookingPage = () => {
                     <select
                       value={booking.staff_id}
                       onChange={(e) => handleStaffChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       required
                     >
                       <option value="">Choose a staff member...</option>
@@ -392,7 +392,7 @@ const BookingPage = () => {
                   <select
                     value={booking.service_id}
                     onChange={(e) => handleServiceChange(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     required
                   >
                     <option value="">Choose a service...</option>
@@ -414,7 +414,7 @@ const BookingPage = () => {
                     value={booking.date}
                     onChange={(e) => handleDateChange(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     required
                   />
                 </div>
@@ -433,7 +433,7 @@ const BookingPage = () => {
                           onClick={() => handleTimeChange(time)}
                           className={`px-3 py-2 text-sm rounded-md border ${
                             booking.start_time === time
-                              ? 'bg-blue-600 text-white border-blue-600'
+                              ? 'bg-pink-600 text-white border-pink-600'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                           }`}
                         >
@@ -454,7 +454,7 @@ const BookingPage = () => {
                       type="text"
                       value={booking.customer_name}
                       onChange={(e) => handleInputChange('customer_name', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       required
                     />
                   </div>
@@ -467,7 +467,7 @@ const BookingPage = () => {
                       type="email"
                       value={booking.customer_email}
                       onChange={(e) => handleInputChange('customer_email', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                       required
                     />
                   </div>
@@ -480,7 +480,7 @@ const BookingPage = () => {
                       type="tel"
                       value={booking.customer_phone}
                       onChange={(e) => handleInputChange('customer_phone', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     />
                   </div>
                 </div>
@@ -494,7 +494,7 @@ const BookingPage = () => {
                     value={booking.notes}
                     onChange={(e) => handleInputChange('notes', e.target.value)}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
                     placeholder="Any special requests or notes for your appointment..."
                   />
                 </div>
@@ -502,7 +502,7 @@ const BookingPage = () => {
                 {/* Appointment Summary */}
                 {booking.date && booking.start_time && selectedService && (
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Appointment Summary</h3>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2">Appointment Summary</h3>
                     <div className="space-y-2 text-sm">
                       <p><span className="font-medium">Date:</span> {new Date(booking.date).toLocaleDateString()}</p>
                       <p><span className="font-medium">Time:</span> {booking.start_time} - {booking.end_time}</p>
@@ -525,7 +525,7 @@ const BookingPage = () => {
                   <button
                     type="submit"
                     disabled={loading || !booking.staff_id || !booking.service_id || !booking.date || !booking.start_time}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Booking...' : 'Book Appointment'}
                   </button>

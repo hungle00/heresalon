@@ -8,13 +8,14 @@ import StaffProfilePage from './pages/StaffProfilePage';
 import StaffCalendarPage from './pages/staffs/CalendarPage';
 import ProfileEditPage from './pages/staffs/ProfileEditPage';
 import BookingPage from './pages/BookingPage';
+import ServiceDetailPage from './pages/services/ServiceDetailPage';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         {/* Navigation */}
-        <nav className="bg-blue-600 shadow-lg">
+        <nav className="bg-pink-600 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center">
@@ -24,20 +25,14 @@ function App() {
               </div>
               <div className="flex items-center space-x-4">
                 <Link 
-                  to="/" 
-                  className="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Home
-                </Link>
-                <Link 
                   to="/salon" 
-                  className="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white hover:text-pink-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Salon
                 </Link>
                 <Link 
                   to="/staff/calendar" 
-                  className="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-white hover:text-pink-200 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Calendar
                 </Link>
@@ -51,6 +46,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/salon" element={<SalonPage />} />
+            <Route path="/service/:id" element={<ServiceDetailPage />} />
             <Route path="/staff/:id" element={<StaffProfilePage />} />
             <Route path="/staff/:id/edit" element={<ProfileEditPage />} />
             <Route path="/booking" element={<BookingPage />} />
