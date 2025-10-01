@@ -5,7 +5,8 @@ from src.models.base import BaseModel, db
 class UserRole(Enum):
     CUSTOMER = "customer"
     ADMIN = "admin"
-
+    MANAGER = "manager"
+    STAFF = "staff"
 
 class User(BaseModel):
     __tablename__ = 'users'
@@ -14,7 +15,12 @@ class User(BaseModel):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password_hash = db.Column(db.String(255), nullable=True)
     role = db.Column(db.Enum(UserRole), nullable=False, default=UserRole.CUSTOMER)
+    # Add salon_id for managers to know which salon they manage
+    salon_id = db.Column(db.Integer, db.ForeignKey('salons.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Relationships
+    managed_salon = db.relationship('Salon', foreign_keys=[salon_id], backref='managers')
 
     def __repr__(self):
         return f'<User {self.username} ({self.role.value})>'
@@ -27,12 +33,20 @@ class User(BaseModel):
     def is_admin(self):
         return self.role == UserRole.ADMIN
 
+    @property
+    def is_manager(self):
+        return self.role == UserRole.MANAGER
+
+    @property
+    def is_staff(self):
+        return self.role == UserRole.STAFF
+
     def to_dict(self):
         return {
             'id': self.id,
-            'uuid': self.uuid,
             'username': self.username,
             'email': self.email,
             'role': self.role.value,
+            'salon_id': self.salon_id,
             'created_at': self.created_at.isoformat() if self.created_at else None
-        } 
+        }

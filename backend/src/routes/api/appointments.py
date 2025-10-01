@@ -1,29 +1,40 @@
 from flask import Blueprint, jsonify, request
+from flask import current_app
+from datetime import datetime, date
+
 from src.models import Appointment
 from src.models.appointment import AppointmentStatus
-from datetime import datetime, date
+from src.routes.api.auth import token_required
 
 blueprint = Blueprint('appointments', __name__, url_prefix='/api')
 
 @blueprint.route('/appointments/', methods=['GET'])
-def get_appointments():
-    """Get all appointments"""
-    appointments = Appointment.list()
+@token_required
+def get_appointments(current_user):
+    """Get all appointments for current user"""
+    # For customers, only show their own appointments
+    # For staff/admin, show all appointments
+    if current_user.role.value == 'customer':
+        appointments = Appointment.query.filter_by(user_id=current_user.id).all()
+    else:
+        appointments = Appointment.list()
+    
     return jsonify([appointment.to_dict() for appointment in appointments])
 
 @blueprint.route('/appointments/', methods=['POST'])
-def create_appointment():
+@token_required
+def create_appointment(current_user):
     """Create a new appointment"""
     data = request.get_json()
     
-    required_fields = ['staff_id', 'user_id', 'service_id', 'date', 'start_time', 'end_time']
+    required_fields = ['staff_id', 'service_id', 'date', 'start_time', 'end_time']
     if not all(field in data for field in required_fields):
         return jsonify({'error': 'All required fields must be provided'}), 400
     
     try:
         appointment = Appointment.create(
             staff_id=data['staff_id'],
-            user_id=data['user_id'],
+            user_id=current_user.id,  # Use current user's ID
             service_id=data['service_id'],
             status=AppointmentStatus(data.get('status', 'pending')),
             date=date.fromisoformat(data['date']),
@@ -35,19 +46,30 @@ def create_appointment():
         return jsonify({'error': str(e)}), 400
 
 @blueprint.route('/appointments/<int:appointment_id>/', methods=['GET'])
-def get_appointment(appointment_id):
+@token_required
+def get_appointment(current_user, appointment_id):
     """Get appointment by ID"""
     appointment = Appointment.get(id=appointment_id)
     if not appointment:
         return jsonify({'error': 'Appointment not found'}), 404
+    
+    # Check if user can access this appointment
+    if current_user.role.value == 'customer' and appointment.user_id != current_user.id:
+        return jsonify({'error': 'Access denied'}), 403
+    
     return jsonify(appointment.to_dict())
 
 @blueprint.route('/appointments/<int:appointment_id>/', methods=['PUT'])
-def update_appointment(appointment_id):
+@token_required
+def update_appointment(current_user, appointment_id):
     """Update appointment"""
     appointment = Appointment.get(id=appointment_id)
     if not appointment:
         return jsonify({'error': 'Appointment not found'}), 404
+    
+    # Check if user can modify this appointment
+    if current_user.role.value == 'customer' and appointment.user_id != current_user.id:
+        return jsonify({'error': 'Access denied'}), 403
     
     data = request.get_json()
     
@@ -67,11 +89,16 @@ def update_appointment(appointment_id):
         return jsonify({'error': str(e)}), 400
 
 @blueprint.route('/appointments/<int:appointment_id>/', methods=['DELETE'])
-def delete_appointment(appointment_id):
+@token_required
+def delete_appointment(current_user, appointment_id):
     """Delete appointment"""
     appointment = Appointment.get(id=appointment_id)
     if not appointment:
         return jsonify({'error': 'Appointment not found'}), 404
     
+    # Check if user can delete this appointment
+    if current_user.role.value == 'customer' and appointment.user_id != current_user.id:
+        return jsonify({'error': 'Access denied'}), 403
+    
     appointment.delete()
-    return jsonify({'message': 'Appointment deleted successfully'}) 
+    return jsonify({'message': 'Appointment deleted successfully'})

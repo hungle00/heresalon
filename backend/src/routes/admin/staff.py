@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from src.models import Staff, Salon
 from src.models.staff import StaffRole, Seniority
-from src.routes.admin_auth import admin_required
+from src.routes.admin_auth import manager_or_admin_required
 
 blueprint = Blueprint('admin_staff', __name__, url_prefix='/admin')
 
 @blueprint.route('/staff/')
-@admin_required
+@manager_or_admin_required
 def staff():
     """List all staff members."""
     # Get filter parameters

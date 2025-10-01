@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template
 from src.models import User, Salon, Staff, Service, Appointment
 from src.models.appointment import AppointmentStatus
-from src.routes.admin_auth import admin_required
+from src.routes.admin_auth import manager_or_admin_required
 
 blueprint = Blueprint('admin', __name__, url_prefix='/admin')
 
 @blueprint.route('/')
-@admin_required
+@manager_or_admin_required
 def dashboard():
     """Admin dashboard"""
     stats = {
