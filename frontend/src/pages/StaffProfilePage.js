@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { mockStaff } from '../data/mockData';
 
 function StaffProfilePage() {
   const { id } = useParams();
+  const { isAuthenticated } = useAuth();
   const [staff, setStaff] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -31,7 +33,7 @@ function StaffProfilePage() {
       if (mockStaffMember) {
         setStaff(mockStaffMember);
       } else {
-        setError('Staff not found');
+        setError('Staff member not found');
       }
     } finally {
       setLoading(false);
@@ -40,23 +42,21 @@ function StaffProfilePage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-600"></div>
       </div>
     );
   }
 
   if (error || !staff) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Staff Not Found</h1>
-          <p className="text-gray-600 mb-8">The staff member you're looking for doesn't exist.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Staff Not Found</h1>
+          <p className="text-gray-600 mb-4">The staff member you're looking for doesn't exist.</p>
           <Link
             to="/salon"
-            className="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition duration-300"
+            className="inline-flex items-center px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
           >
             Back to Salon
           </Link>
@@ -66,103 +66,113 @@ function StaffProfilePage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Back Button and Action Buttons - Mobile Optimized */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <Link 
-          to="/salon"
-          className="inline-flex items-center text-pink-600 hover:text-pink-800 text-sm sm:text-base"
-        >
-          <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Staff
-        </Link>
-        
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-          <Link
-            to={`/booking?staff_id=${id}`}
-            className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
-          >
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Book Now
-          </Link>
-          
-          <Link
-            to={`/staff/${id}/edit`}
-            className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm sm:text-base"
-          >
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Edit Profile
-          </Link>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Profile Image */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img 
-              src={staff.image_url} 
-              alt={staff.name}
-              className="w-full h-64 sm:h-80 object-cover"
-            />
-            <div className="p-6">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-                {staff.name}
-              </h1>
-              <p className="text-lg text-gray-600 mb-4">
-                {staff.role}
-              </p>
-              <div className="flex items-center mb-4">
-                <div className="flex items-center">
-                  <span className="text-yellow-400 text-lg mr-1">⭐</span>
-                  <span className="font-semibold">{staff.rating}</span>
-                </div>
-                <span className="text-gray-500 ml-2">
-                  ({staff.years_experience} years experience)
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center space-x-4 mb-4 md:mb-0">
+              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-pink-600">
+                  {staff.name.charAt(0)}
                 </span>
               </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{staff.name}</h1>
+                <p className="text-gray-600">{staff.specialty}</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                to={`/booking?staff_id=${id}`}
+                className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Book Now
+              </Link>
+              
+              {isAuthenticated ? (
+                <Link
+                  to={`/staff/${id}/edit`}
+                  className="inline-flex items-center justify-center px-3 py-2 sm:px-4 sm:py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm sm:text-base"
+                >
+                  <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                  Edit Profile
+                </Link>
+              ) : null}
             </div>
           </div>
         </div>
 
-        {/* Profile Details */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">About</h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              {staff.bio}
-            </p>
-            
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Specialties</h3>
-              <div className="flex flex-wrap gap-2">
-                {staff.specialties?.map((specialty, index) => (
-                  <span 
-                    key={index}
-                    className="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm"
-                  >
-                    {specialty}
-                  </span>
-                ))}
+        {/* Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* About Section */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">About</h2>
+              <p className="text-gray-600 leading-relaxed">
+                {staff.bio || `Meet ${staff.name}, a professional ${staff.specialty.toLowerCase()} with years of experience in the beauty industry. ${staff.name} is passionate about helping clients look and feel their best.`}
+              </p>
+            </div>
+
+            {/* Services Section */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Services</h2>
+              <div className="space-y-3">
+                {staff.services?.map((service, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                    <span className="text-gray-700">{service.name}</span>
+                    <span className="text-pink-600 font-semibold">${service.price}</span>
+                  </div>
+                )) || (
+                  <div className="text-gray-500 italic">No services listed</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Contact Info */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact</h3>
+              <div className="space-y-3">
+                <div className="flex items-center text-gray-600">
+                  <svg className="w-5 h-5 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>{staff.email || 'contact@salon.com'}</span>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  <svg className="w-5 h-5 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <span>{staff.phone || '+1 (555) 123-4567'}</span>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Experience</h3>
-                <p className="text-gray-600">{staff.years_experience} years</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Rating</h3>
-                <div className="flex items-center">
-                  <span className="text-yellow-400 text-lg mr-1">⭐</span>
-                  <span className="font-semibold">{staff.rating}</span>
+            {/* Availability */}
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Availability</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Monday - Friday</span>
+                  <span className="text-gray-900">9:00 AM - 6:00 PM</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Saturday</span>
+                  <span className="text-gray-900">10:00 AM - 4:00 PM</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Sunday</span>
+                  <span className="text-gray-900">Closed</span>
                 </div>
               </div>
             </div>
