@@ -5,12 +5,13 @@ module.exports = function(app) {
     '/api',
     createProxyMiddleware({
       target: 'http://localhost:8080',
-    })
-  );
-  app.use(
-    '/test-bucket',
-    createProxyMiddleware({
-      target: 'http://localstack:4566',
+      changeOrigin: true,
+      onProxyRes: function (proxyRes, req, res) {
+        proxyRes.headers['Access-Control-Allow-Origin'] = '*';
+        proxyRes.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+        proxyRes.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With';
+        proxyRes.headers['Access-Control-Allow-Credentials'] = 'true';
+      }
     })
   );
 };
