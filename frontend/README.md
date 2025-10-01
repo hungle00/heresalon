@@ -37,27 +37,47 @@ A modern React frontend for the salon management system, built with React Router
 - `yarn test` - Run tests
 - `yarn eject` - Eject from Create React App
 
-## API Integration
+## Mock Mode Setup
 
-### Backend Connection
-The frontend is configured to connect to the Flask backend running on port 8080:
+This React app can run in mock mode for testing without a backend server.
 
-```javascript
-// API Base URL
-const API_BASE_URL = 'http://localhost:8080';
-
-// Available Endpoints
-GET /api/staff/          # List all staff
-GET /api/staff/:id/      # Get staff by ID
-GET /api/salons/         # List all salons
-GET /api/services/       # List all services
-GET /api/appointments/   # List all appointments
+### How to Enable Mock Mode
+Create a `.env.local` file in the frontend directory:
+```
+REACT_APP_USE_MOCK=true
+REACT_APP_API_URL=
 ```
 
-### Mock Data
-When the backend is not available, the application automatically falls back to mock data:
+Or the app automatically uses mock mode when:
+- No `REACT_APP_API_URL` is set
+- `REACT_APP_USE_MOCK=true` is set
 
-- **Sarah Johnson** - Senior Hair Stylist (8 years experience)
-- **Mike Chen** - Barber (5 years experience)
-- **Emma Davis** - Beauty Specialist (6 years experience)
+## Mock Mode Features
+
+### Authentication
+- **Any email/password combination works**
+- Users are automatically logged in
+- Mock JWT tokens are generated
+- User data is stored in localStorage
+
+### Mock Data
+- Staff members
+- Salon information
+- Services
+- Appointments (empty array)
+
+## Testing Login
+
+1. Click the "Login" button
+2. Enter any email (e.g., `test@example.com`)
+3. Enter any password (e.g., `password123`)
+4. Click "Login" - you'll be automatically signed in!
+
+## Switching to Real Backend
+
+To use the real backend:
+1. Set `REACT_APP_API_URL=http://localhost:8080` in `.env.local`
+2. Set `REACT_APP_USE_MOCK=false` or remove it
+3. Make sure the backend server is running
+
 
