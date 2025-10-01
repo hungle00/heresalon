@@ -32,7 +32,6 @@ class Staff(BaseModel):
     # Relationships
     appointments = db.relationship('Appointment', backref='staff', lazy=True)
     working_hours = db.relationship('WorkingHour', backref='staff', lazy=True)
-    staff_services = db.relationship('StaffService', backref='staff', lazy=True)
 
     def __repr__(self):
         return f'<Staff {self.name}>'
@@ -51,4 +50,4 @@ class Staff(BaseModel):
             'specialties': self.specialties,
             'image_url': self.image_url,
             'created_at': self.created_at.isoformat() if self.created_at else None
-        } 
+        }

@@ -2,12 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from decimal import Decimal
 from src.models import Service
 from src.models.service import ServiceType
-from src.routes.admin_auth import admin_required
+from src.routes.admin_auth import manager_or_admin_required
 
 blueprint = Blueprint('admin_services', __name__, url_prefix='/admin')
 
 @blueprint.route('/services/')
-@admin_required
+@manager_or_admin_required
 def services():
     """List all services."""
     # Get filter parameters
