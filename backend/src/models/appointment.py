@@ -31,12 +31,11 @@ class Appointment(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'uuid': self.uuid,
             'staff_id': self.staff_id,
             'user_id': self.user_id,
             'service_id': self.service_id,
             'status': self.status.value,
             'date': self.date.isoformat() if self.date else None,
-            'start_time': self.start_time.isoformat() if self.start_time else None,
-            'end_time': self.end_time.isoformat() if self.end_time else None
+            'start_time': self.start_time.time().strftime('%H:%M') if self.start_time else None,
+            'end_time': self.end_time.time().strftime('%H:%M') if self.end_time else None
         } 

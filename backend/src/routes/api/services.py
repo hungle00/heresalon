@@ -19,10 +19,7 @@ def get_services(salon_id):
         salon_services = SalonService.query.filter_by(salon_id=salon_id).all()
         services = [salon_service.service for salon_service in salon_services]
         
-        return jsonify({
-            'salon': salon.to_dict(),
-            'services': [service.to_dict() for service in services]
-        })
+        return jsonify([service.to_dict() for service in services])
     else:
         return jsonify({'error': 'Salon not found'}), 404
 

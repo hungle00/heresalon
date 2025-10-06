@@ -9,7 +9,7 @@ import os
 import sys
 from decimal import Decimal
 from src.entry import flask_app
-from src.models import db, Salon, Staff, Service, SalonService, User
+from src.models import db, Salon, Staff, Service, SalonService, User, Appointment
 from src.models.staff import StaffRole, Seniority
 from src.models.service import ServiceType
 from src.models.user import UserRole
@@ -171,6 +171,103 @@ def seed_services():
         except Exception as e:
             print(f"❌ Error creating service {service_data['name']}: {e}")
 
+def create_appointment_data():
+    """Create appointment data for October 2025 with 30-minute time slots."""
+    print("\n🌱 Creating appointment data for October 2025...")
+    
+    from datetime import datetime, date, time, timedelta
+    from src.models.appointment import Appointment, AppointmentStatus
+    
+    # Get existing staff and services
+    staffs = Staff.query.all()
+    services = Service.query.all()
+    users = User.query.filter(User.role.in_([UserRole.ADMIN, UserRole.MANAGER])).all()
+    
+    if not staffs or not services or not users:
+        print("❌ Need staff, services, and users to create appointments")
+        return
+
+    # October 2025 dates
+    october_2025 = date(2025, 10, 1)
+    
+    # Time slots (30-minute intervals from 9:00 AM to 6:00 PM)
+    time_slots = [
+        time(9, 0),   # 9:00 AM
+        time(9, 30),  # 9:30 AM
+        time(10, 0),  # 10:00 AM
+        time(10, 30), # 10:30 AM
+        time(11, 0),  # 11:00 AM
+        time(11, 30), # 11:30 AM
+        time(12, 0),  # 12:00 PM
+        time(12, 30), # 12:30 PM
+        time(13, 0),  # 1:00 PM
+        time(13, 30), # 1:30 PM
+        time(14, 0),  # 2:00 PM
+        time(14, 30), # 2:30 PM
+        time(15, 0),  # 3:00 PM
+        time(15, 30), # 3:30 PM
+        time(16, 0),  # 4:00 PM
+        time(16, 30), # 4:30 PM
+        time(17, 0),  # 5:00 PM
+        time(17, 30), # 5:30 PM
+        time(18, 0),  # 6:00 PM
+    ]
+    # Status options
+    statuses = [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED]
+    
+    # Create appointments for the first 15 days of October 2025
+    appointments_created = 0
+
+    for day in range(1, 16):  # October 1-15, 2025
+        appointment_date = date(2025, 10, day)
+        
+        # Skip weekends (Saturday = 5, Sunday = 6)
+        if appointment_date.weekday() >= 5:
+            continue
+            
+        # Create 2-4 appointments per day
+        num_appointments = 2 + (day % 3)  # 2, 3, or 4 appointments
+
+        for i in range(num_appointments):
+            # Randomly select staff, service, and user
+            import random
+            staff = random.choice(staffs)
+            service = random.choice(services)
+            user = random.choice(users)
+            
+            # Select a random time slot
+            start_time_slot = random.choice(time_slots[:-1])  # Don't pick the last slot
+            start_datetime = datetime.combine(appointment_date, start_time_slot)
+            end_datetime = start_datetime + timedelta(minutes=30)
+
+            # Check if appointment already exists
+            existing = Appointment.query.filter_by(
+                staff_id=staff.id,
+                date=appointment_date,
+                start_time=start_datetime
+            ).first()
+            
+            if existing:
+                continue
+
+            try:
+                appointment = Appointment.create(
+                    staff_id=staff.id,
+                    user_id=user.id,
+                    service_id=service.id,
+                    status=random.choice(statuses),
+                    date=appointment_date,
+                    start_time=start_datetime,
+                    end_time=end_datetime
+                )
+                appointments_created += 1
+                print(f"✅ Created appointment: {appointment_date} {start_time_slot} - {staff.name} & {service.name}")
+                
+            except Exception as e:
+                print(f"❌ Error creating appointment: {e}")
+    
+    print(f"🎉 Created {appointments_created} appointments for October 2025!")
+
 def create_salon_service_relationships():
     """Create relationships between salon and services."""
     print("\n🌱 Creating salon-service relationships...")
@@ -226,6 +323,9 @@ def main():
             
             # Create salon-service relationships
             create_salon_service_relationships()
+
+            # Create appointment data
+            create_appointment_data()
             
             print("\n🎉 Database seeding completed successfully!")
             print(f"📊 Summary:")
@@ -236,6 +336,7 @@ def main():
             print(f"   - Users: {User.query.count()}")
             print(f"   - Admin users: {User.query.filter_by(role=UserRole.ADMIN).count()}")
             print(f"   - Manager users: {User.query.filter_by(role=UserRole.MANAGER).count()}")
+            print(f"   - Appointments: {Appointment.query.count()}")
             
         except Exception as e:
             print(f"❌ Error during seeding: {e}")
