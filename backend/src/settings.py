@@ -37,3 +37,9 @@ class Settings:
             },
         }
     }
+
+    # bot
+    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")  # either "openai" or "gemini"
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") # 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
+    # TODO: 
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
