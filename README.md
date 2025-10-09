@@ -41,6 +41,18 @@ A comprehensive salon management system with React frontend and Flask backend th
    docker-compose up --build
    ```
 
+3. **Setup Backend**:
+
+   - Access container by this command:
+   ```bash
+   docker exec -it heresalon-backend-1 bash
+   ```
+   - After that, run migration and dump data
+   ```bash
+   poetry run flask db upgrade        # Run database migrations
+   poetry run python run_seed.py      # Seed dump data
+   ```
+
 3. **Access the application**:
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8080/api/
@@ -52,8 +64,8 @@ A comprehensive salon management system with React frontend and Flask backend th
 ```bash
 cd backend
 poetry install
-poetry run python create_admin.py  # Create admin user
 poetry run flask db upgrade        # Run database migrations
+poetry run python run_seed.py      # Seed dump data
 FLASK_APP=src.entry:flask_app poetry run flask run --port=8080
 ```
 

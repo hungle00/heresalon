@@ -26,6 +26,8 @@ This Flask application includes 2 main components:
 
 - Python 3.8+
 - Poetry
+- Postgresql
+- Redis
 - Docker & Docker Compose (optional)
 
 ### Installation
@@ -41,7 +43,7 @@ This Flask application includes 2 main components:
    poetry run flask db upgrade
    ```
 
-3. **Create admin user**:
+3. **Seed dump data**:
    ```bash
    poetry run python run_seed.py
    ```
@@ -60,14 +62,19 @@ This Flask application includes 2 main components:
    poetry run flask run
    ```
 
-### Docker Setup
 
-1. **Build and run with Docker Compose**:
+
+### Docker for Postgresql & Redis
+
+If you do not have Postgresql & Redis locally, you can use container instead:
+1. **Build and run container**
    ```bash
-   docker-compose up --build
+   docker-compose up -d postgres redis
    ```
 
-2. **Access the application**:
+   After that, run migration and dump data
+
+3. **Access the application**:
    - API: http://localhost:8080/api/
    - Admin: http://localhost:8080/admin/
    - Health Check: http://localhost:8080/
