@@ -3,9 +3,9 @@ from src.models.base import BaseModel, db
 
 
 class StaffRole(Enum):
-    STYLIST = "stylist"
-    MANAGER = "manager"
-    RECEPTIONIST = "receptionist"
+    STYLIST = 1
+    MANAGER = 2
+    RECEPTIONIST = 3
 
 
 class Seniority(Enum):

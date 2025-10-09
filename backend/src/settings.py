@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class Parse:
@@ -15,7 +19,7 @@ class Settings:
     # General
     DEV = Parse.bool('DEV')
     REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
-    REDIS_URL = f'redis://{REDIS_HOST}:6379'
+    REDIS_URL = os.getenv('REDIS_URL', f'redis://{REDIS_HOST}:6379')
 
     # Flask
     SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-this-in-production')

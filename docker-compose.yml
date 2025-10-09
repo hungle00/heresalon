@@ -27,11 +27,12 @@ services:
       DATABASE_URL: 'postgres://heresalon:heresalon123@postgres/heresalon'
       DEV: ${DEV}
       FLASK_DEBUG: '1'
+    tty: true
+    stdin_open: true
     volumes:
       - './backend/filesystem/entrypoints:/entrypoints:ro'
       - './backend/migrations:/srv/migrations'
       - './backend/src:/srv/src:ro'
-      - './backend/data:/srv/data'  # Volume cho SQLite database file
     ports:
       - '8080:8080'
     depends_on:
@@ -41,9 +42,9 @@ services:
   postgres:
     image: 'postgres:9.6-alpine'
     environment:
-      POSTGRES_USER: 'obscure-user'
-      POSTGRES_PASSWORD: 'obscure-password'
-      POSTGRES_DB: 'app'
+      POSTGRES_USER: 'heresalon'
+      POSTGRES_PASSWORD: 'heresalon123'
+      POSTGRES_DB: 'heresalon'
       PGDATA: '/var/lib/postgresql/data/pgdata'
     volumes:
       - 'postgres:/var/lib/postgresql/data'
@@ -74,3 +75,4 @@ services:
 
 volumes:
   postgres:
+  redis:
