@@ -487,6 +487,21 @@ docs = ["pallets-sphinx-themes", "sphinx", "sphinx-issues", "sphinxcontrib-log-c
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-cors"
+version = "3.0.10"
+description = "A Flask extension adding a decorator for CORS support"
+optional = false
+python-versions = "*"
+files = [
+    {file = "Flask-Cors-3.0.10.tar.gz", hash = "sha256:b60839393f3b84a0f3746f6cdca56c1ad7426aa738b70d6c61375857823181de"},
+    {file = "Flask_Cors-3.0.10-py2.py3-none-any.whl", hash = "sha256:74efc975af1194fc7891ff5cd85b0f7478be4f7f59fe158102e91abb72bb4438"},
+]
+
+[package.dependencies]
+Flask = ">=0.9"
+Six = "*"
+
+[[package]]
 name = "flask-migrate"
 version = "2.5.3"
 description = "SQLAlchemy database migrations for Flask applications using Alembic"
@@ -1319,4 +1334,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.8"
-content-hash = "97db764a9ef13ed7cb93d2ebadac8eb1b61870bf7ff65d8f7f55cf9cb5a60eec"
+content-hash = "5f58af74cd4824fdeea9da5a56a7bbf90be8fa7810160af3cfd622407fab27ad"

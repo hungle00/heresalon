@@ -18,7 +18,7 @@ function SalonPage() {
       setError(null);
       
       // Fetch staff data
-      const staffResponse = await fetch('/api/staff/');
+      const staffResponse = await fetch('/api/salons/1/staffs');
       if (!staffResponse.ok) {
         throw new Error('Failed to fetch staff');
       }
@@ -26,7 +26,7 @@ function SalonPage() {
       setStaff(staffData);
 
       // Fetch services data
-      const servicesResponse = await fetch('/api/services/');
+      const servicesResponse = await fetch('/api/salons/1/services');
       if (!servicesResponse.ok) {
         throw new Error('Failed to fetch services');
       }

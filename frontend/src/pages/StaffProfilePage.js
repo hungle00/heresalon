@@ -19,7 +19,7 @@ function StaffProfilePage() {
       setLoading(true);
       setError(null);
       
-      const response = await fetch(`/api/staff/${id}/`);
+      const response = await fetch(`/api/staffs/${id}/`);
       if (response.ok) {
         const staffData = await response.json();
         setStaff(staffData);
