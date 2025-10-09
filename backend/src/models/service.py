@@ -31,7 +31,6 @@ class Service(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'uuid': self.uuid,
             'name': self.name,
             'description': self.description,
             'type': self.type.value,

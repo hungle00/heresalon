@@ -39,7 +39,6 @@ class Staff(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'uuid': self.uuid,
             'salon_id': self.salon_id,
             'name': self.name,
             'bio': self.bio,
