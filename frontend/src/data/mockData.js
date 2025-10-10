@@ -10,29 +10,29 @@ export const mockStaff = [
     seniority: 'Senior',
     rating: 4.9,
     specialties: ['Hair Coloring', 'Hair Cutting', 'Styling'],
-    image_url: 'https://via.placeholder.com/300x200?text=Sarah+Johnson'
+    image_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: 2,
     name: 'Mike Chen',
-    role: 'Barber',
+    role: 'Master Barber',
     bio: 'Expert in men\'s grooming and traditional barbering techniques.',
     years_experience: 5,
     seniority: 'Senior',
     rating: 4.8,
     specialties: ['Men\'s Haircuts', 'Beard Trimming', 'Shaving'],
-    image_url: 'https://via.placeholder.com/300x200?text=Mike+Chen'
+    image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
   },
   {
     id: 3,
-    name: 'Emma Davis',
-    role: 'Beauty Specialist',
+    name: 'Emma Wilson',
+    role: 'Nail Specialist',
     bio: 'Specialized in facial treatments and beauty services.',
     years_experience: 6,
     seniority: 'Senior',
     rating: 4.7,
     specialties: ['Facials', 'Manicures', 'Pedicures'],
-    image_url: 'https://via.placeholder.com/300x200?text=Emma+Davis'
+    image_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
   }
 ];
 
@@ -42,7 +42,8 @@ export const mockServices = [
     name: 'Hair Cut & Style',
     description: 'Professional haircut and styling service',
     type: 'hair_cut',
-    price: 250000,
+    price: 75,
+    duration: 60,
     image_url: 'https://via.placeholder.com/300x200?text=Hair+Cut'
   },
   {
@@ -50,7 +51,8 @@ export const mockServices = [
     name: 'Hair Coloring',
     description: 'Full hair coloring service with premium products',
     type: 'hair_color',
-    price: 450000,
+    price: 120,
+    duration: 90,
     image_url: 'https://via.placeholder.com/300x200?text=Hair+Color'
   },
   {
@@ -58,7 +60,8 @@ export const mockServices = [
     name: 'Facial Treatment',
     description: 'Deep cleansing and moisturizing facial treatment',
     type: 'facial',
-    price: 300000,
+    price: 80,
+    duration: 60,
     image_url: 'https://via.placeholder.com/300x200?text=Facial'
   },
   {
@@ -66,7 +69,8 @@ export const mockServices = [
     name: 'Manicure & Pedicure',
     description: 'Complete nail care and polish service',
     type: 'nail_care',
-    price: 200000,
+    price: 45,
+    duration: 45,
     image_url: 'https://via.placeholder.com/300x200?text=Manicure'
   },
   {
@@ -74,7 +78,8 @@ export const mockServices = [
     name: 'Massage Therapy',
     description: 'Relaxing full body massage therapy',
     type: 'massage',
-    price: 400000,
+    price: 100,
+    duration: 90,
     image_url: 'https://via.placeholder.com/300x200?text=Massage'
   },
   {
@@ -82,7 +87,8 @@ export const mockServices = [
     name: 'Hair Styling',
     description: 'Special occasion hair styling and updo',
     type: 'hair_styling',
-    price: 350000,
+    price: 90,
+    duration: 75,
     image_url: 'https://via.placeholder.com/300x200?text=Styling'
   }
 ];
