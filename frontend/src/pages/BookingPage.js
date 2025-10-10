@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import ConfirmationBooking from '../components/ConfirmationBooking';
+import { mockStaff, mockServices } from '../data/mockData';
 
 const BookingPage = () => {
   const [searchParams] = useSearchParams();
@@ -29,6 +31,7 @@ const BookingPage = () => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Time slots (30-minute intervals)
   const timeSlots = [
@@ -37,9 +40,50 @@ const BookingPage = () => {
     '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
   ];
 
+  const loadStaffAndServices = useCallback(async () => {
+    // Helper function to set staff from data
+    const setStaffFromData = (staffData) => {
+      if (staffId) {
+        const selectedStaff = staffData.find(s => s.id === parseInt(staffId));
+        if (selectedStaff) {
+          setStaff(selectedStaff);
+        }
+      }
+    };
+    try {
+      setLoading(true);
+      // Try to fetch from API first
+      const [staffResponse, servicesResponse] = await Promise.all([
+        fetch(`/api/salons/1/staffs/`),
+        fetch(`/api/salons/1/services/`)
+      ]);
+
+      if (staffResponse.ok && servicesResponse.ok) {
+        const staffData = await staffResponse.json();
+        const servicesData = await servicesResponse.json();
+        setAllStaff(staffData);
+        setServices(servicesData);
+        setStaffFromData(staffData);
+      } else {
+        // Use mock data if API fails
+        setAllStaff(mockStaff);
+        setServices(mockServices);
+        setStaffFromData(mockStaff);
+      }
+    } catch (error) {
+      console.log('Using mock data for booking');
+      // Use mock data
+      setAllStaff(mockStaff);
+      setServices(mockServices);
+      setStaffFromData(mockStaff);
+    } finally {
+      setLoading(false);
+    }
+  }, [staffId]);
+
   useEffect(() => {
     loadStaffAndServices();
-  }, []);
+  }, [loadStaffAndServices]);
 
   useEffect(() => {
     if (staffId && allStaff.length > 0) {
@@ -49,119 +93,6 @@ const BookingPage = () => {
       }
     }
   }, [staffId, allStaff]);
-
-  const loadStaffAndServices = async () => {
-    try {
-      setLoading(true);
-      // Try to fetch from API first
-      const [staffResponse, servicesResponse] = await Promise.all([
-        fetch(`/api/staff/`),
-        fetch(`/api/services/`)
-      ]);
-
-      if (staffResponse.ok && servicesResponse.ok) {
-        const staffData = await staffResponse.json();
-        const servicesData = await servicesResponse.json();
-        setAllStaff(staffData);
-        setServices(servicesData);
-        
-        // If staff_id is provided, set the selected staff
-        if (staffId) {
-          const selectedStaff = staffData.find(s => s.id === parseInt(staffId));
-          if (selectedStaff) {
-            setStaff(selectedStaff);
-          }
-        }
-      } else {
-        // Use mock data if API fails
-        const mockStaff = [
-          {
-            id: 1,
-            name: 'Sarah Johnson',
-            role: 'Senior Hair Stylist',
-            image_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
-          },
-          {
-            id: 2,
-            name: 'Mike Chen',
-            role: 'Master Barber',
-            image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-          },
-          {
-            id: 3,
-            name: 'Emma Wilson',
-            role: 'Nail Specialist',
-            image_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-          }
-        ];
-        
-        const mockServices = [
-          { id: 1, name: 'Hair Cut & Style', price: 75, duration: 60, type: 'Hair' },
-          { id: 2, name: 'Hair Coloring', price: 120, duration: 90, type: 'Hair' },
-          { id: 3, name: 'Highlights', price: 150, duration: 120, type: 'Hair' },
-          { id: 4, name: 'Color Correction', price: 200, duration: 180, type: 'Hair' },
-          { id: 5, name: 'Manicure', price: 45, duration: 45, type: 'Nails' },
-          { id: 6, name: 'Pedicure', price: 55, duration: 60, type: 'Nails' }
-        ];
-        
-        setAllStaff(mockStaff);
-        setServices(mockServices);
-        
-        // If staff_id is provided, set the selected staff
-        if (staffId) {
-          const selectedStaff = mockStaff.find(s => s.id === parseInt(staffId));
-          if (selectedStaff) {
-            setStaff(selectedStaff);
-          }
-        }
-      }
-    } catch (error) {
-      console.log('Using mock data for booking');
-      // Use mock data
-      const mockStaff = [
-        {
-          id: 1,
-          name: 'Sarah Johnson',
-          role: 'Senior Hair Stylist',
-          image_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
-        },
-        {
-          id: 2,
-          name: 'Mike Chen',
-          role: 'Master Barber',
-          image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-        },
-        {
-          id: 3,
-          name: 'Emma Wilson',
-          role: 'Nail Specialist',
-          image_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
-        }
-      ];
-      
-      const mockServices = [
-        { id: 1, name: 'Hair Cut & Style', price: 75, duration: 60, type: 'Hair' },
-        { id: 2, name: 'Hair Coloring', price: 120, duration: 90, type: 'Hair' },
-        { id: 3, name: 'Highlights', price: 150, duration: 120, type: 'Hair' },
-        { id: 4, name: 'Color Correction', price: 200, duration: 180, type: 'Hair' },
-        { id: 5, name: 'Manicure', price: 45, duration: 45, type: 'Nails' },
-        { id: 6, name: 'Pedicure', price: 55, duration: 60, type: 'Nails' }
-      ];
-      
-      setAllStaff(mockStaff);
-      setServices(mockServices);
-      
-      // If staff_id is provided, set the selected staff
-      if (staffId) {
-        const selectedStaff = mockStaff.find(s => s.id === parseInt(staffId));
-        if (selectedStaff) {
-          setStaff(selectedStaff);
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (field, value) => {
     setBooking(prev => ({
@@ -190,7 +121,7 @@ const BookingPage = () => {
     }
   };
 
-  const calculateEndTime = (startTime, duration) => {
+  const calculateEndTime = (startTime, duration = 60) => {
     if (!startTime) return '';
     
     const [hours, minutes] = startTime.split(':').map(Number);
@@ -214,7 +145,7 @@ const BookingPage = () => {
   };
 
   const getAvailableSlots = (date) => {
-    // Mock available slots - in real app, this would come from API
+    // Check if date is in the past
     const today = new Date();
     const selectedDate = new Date(date);
     
@@ -236,40 +167,101 @@ const BookingPage = () => {
     setAvailableSlots(getAvailableSlots(date));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setMessage('');
+
+    // Validate required fields
+    if (!booking.staff_id || !booking.service_id || !booking.date || !booking.start_time || !booking.end_time) {
+      setMessage('Please fill in all required fields.');
+      return;
+    }
+
+    // Validate customer information
+    if (!booking.customer_name) {
+      setMessage('Please provide your name.');
+      return;
+    }
+
+    if (!booking.customer_phone) {
+      setMessage('Please provide your phone number.');
+      return;
+    }
+
+    // Show confirmation page
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmBooking = async () => {
     setLoading(true);
     setMessage('');
 
     try {
+      // Prepare appointment data for API
+      const appointmentData = {
+        staff_id: parseInt(booking.staff_id),
+        service_id: parseInt(booking.service_id),
+        date: booking.date,
+        start_time: booking.start_time,
+        end_time: booking.end_time,
+        customer_name: booking.customer_name,
+        customer_email: booking.customer_email || null,
+        customer_phone: booking.customer_phone,
+        notes: booking.notes || null
+      };
+
+      console.log('Sending appointment data:', appointmentData);
+
       const response = await fetch('/api/appointments/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // Add authentication header if available
+          ...(localStorage.getItem('token') && {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          })
         },
-        body: JSON.stringify(booking)
+        body: JSON.stringify(appointmentData)
       });
+
+      const responseData = await response.json();
 
       if (response.ok) {
         setMessage('Appointment booked successfully!');
-        setTimeout(() => {
-          navigate('/salon');
-        }, 2000);
+        console.log('Appointment created:', responseData);
+        
+        // Navigate to BookingInfoPage with booking data
+        navigate('/booking-info', {
+          state: {
+            bookingData: {
+              booking,
+              selectedStaff,
+              selectedService
+            },
+            message: 'Appointment booked successfully!'
+          }
+        });
       } else {
-        setMessage('Failed to book appointment. Please try again.');
+        console.error('Appointment booking failed:', responseData);
+        setMessage(`Failed to book appointment: ${responseData.error || 'Please try again.'}`);
+        setShowConfirmation(false);
       }
     } catch (error) {
-      console.log('Appointment booked (mock)');
-      setMessage('Appointment booked successfully! (Mock)');
-      setTimeout(() => {
-        navigate('/salon');
-      }, 2000);
+      console.error('Network error:', error);
+      setMessage('Network error. Please check your connection and try again.');
+      setShowConfirmation(false);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCancelConfirmation = () => {
+    setShowConfirmation(false);
+    setMessage('');
+  };
+
   const selectedService = services.find(s => s.id === parseInt(booking.service_id));
+  const selectedStaff = allStaff.find(s => s.id === parseInt(booking.staff_id));
 
   if (loading && allStaff.length === 0) {
     return (
@@ -279,6 +271,21 @@ const BookingPage = () => {
           <p className="mt-4 text-gray-600">Loading booking information...</p>
         </div>
       </div>
+    );
+  }
+
+  // Confirmation Page
+  if (showConfirmation) {
+    return (
+      <ConfirmationBooking
+        booking={booking}
+        selectedStaff={selectedStaff}
+        selectedService={selectedService}
+        message={message}
+        loading={loading}
+        onCancel={handleCancelConfirmation}
+        onConfirm={handleConfirmBooking}
+      />
     );
   }
 
@@ -425,22 +432,28 @@ const BookingPage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Time *
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {availableSlots.map(time => (
-                        <button
-                          key={time}
-                          type="button"
-                          onClick={() => handleTimeChange(time)}
-                          className={`px-3 py-2 text-sm rounded-md border ${
-                            booking.start_time === time
-                              ? 'bg-pink-600 text-white border-pink-600'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {time}
-                        </button>
-                      ))}
-                    </div>
+                    {availableSlots.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-2">
+                        {availableSlots.map(time => (
+                          <button
+                            key={time}
+                            type="button"
+                            onClick={() => handleTimeChange(time)}
+                            className={`px-3 py-2 text-sm rounded-md border ${
+                              booking.start_time === time
+                                ? 'bg-pink-600 text-white border-pink-600'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        No available time slots for this date.
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -461,26 +474,26 @@ const BookingPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email *
+                      Email
                     </label>
                     <input
                       type="email"
                       value={booking.customer_email}
                       onChange={(e) => handleInputChange('customer_email', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      required
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
+                      Phone Number *
                     </label>
                     <input
                       type="tel"
                       value={booking.customer_phone}
                       onChange={(e) => handleInputChange('customer_phone', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      required
                     />
                   </div>
                 </div>
@@ -499,19 +512,6 @@ const BookingPage = () => {
                   />
                 </div>
 
-                {/* Appointment Summary */}
-                {booking.date && booking.start_time && selectedService && (
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-2">Appointment Summary</h3>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Date:</span> {new Date(booking.date).toLocaleDateString()}</p>
-                      <p><span className="font-medium">Time:</span> {booking.start_time} - {booking.end_time}</p>
-                      <p><span className="font-medium">Service:</span> {selectedService.name}</p>
-                      <p><span className="font-medium">Duration:</span> {selectedService.duration} minutes</p>
-                      <p><span className="font-medium">Price:</span> ${selectedService.price}</p>
-                    </div>
-                  </div>
-                )}
 
                 {/* Action Buttons */}
                 <div className="flex justify-end space-x-4">
@@ -524,10 +524,10 @@ const BookingPage = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading || !booking.staff_id || !booking.service_id || !booking.date || !booking.start_time}
+                    disabled={!booking.staff_id || !booking.service_id || !booking.date || !booking.start_time}
                     className="px-6 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Booking...' : 'Book Appointment'}
+                    Review & Confirm
                   </button>
                 </div>
               </div>
