@@ -138,7 +138,8 @@ def delete(appointment_id):
     
     return redirect(url_for('admin_appointments.index'))
 
-@blueprint.route('/<int:appointment_id>/status', methods=['POST'])
+@blueprint.route('/<int:appointment_id>/status', methods=['PUT'])
+@manager_or_admin_required
 def update_status(appointment_id):
     """Update appointment status via AJAX."""
     appointment = Appointment.query.get_or_404(appointment_id)
@@ -148,11 +149,13 @@ def update_status(appointment_id):
         return jsonify({'error': 'Invalid status'}), 400
     
     try:
-        appointment.status = new_status
+        # Convert string to AppointmentStatus enum
+        status_enum = AppointmentStatus(new_status)
+        appointment.status = status_enum
         db.session.commit()
         return jsonify({
             'success': True,
-            'status': appointment.status,
+            'status': appointment.status.value,
             'message': 'Status updated successfully'
         })
     except Exception as e:
