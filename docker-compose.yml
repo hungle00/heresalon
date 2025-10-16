@@ -49,7 +49,7 @@ services:
     volumes:
       - 'postgres:/var/lib/postgresql/data'
     ports:
-      - '5432'
+      - '5432:5432'
 
   worker:
     labels:
@@ -71,7 +71,7 @@ services:
   redis:
     image: 'redis:5.0-alpine'
     ports:
-      - '6379'
+      - '6379:6379'
 
 volumes:
   postgres:

@@ -22,7 +22,7 @@ def index():
     search = request.args.get('search', '')
     
     # Build query
-    query = Appointment.query.join(Staff).join(User).join(Service)
+    query = Appointment.query.join(Staff).outerjoin(User).join(Service)
     
     # Apply filters
     if status_filter:
@@ -43,7 +43,8 @@ def index():
             or_(
                 User.username.ilike(f'%{search}%'),
                 Staff.name.ilike(f'%{search}%'),
-                Service.name.ilike(f'%{search}%')
+                Service.name.ilike(f'%{search}%'),
+                Appointment.phone_number.ilike(f'%{search}%')
             )
         )
     
@@ -181,7 +182,7 @@ def calendar():
             Appointment.date >= start_date,
             Appointment.date < end_date
         )
-    ).join(Staff).join(Service).join(User).all()
+    ).join(Staff).outerjoin(User).join(Service).all()
     
     # Get staff for filtering
     staffs = Staff.query.all()
