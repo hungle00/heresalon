@@ -1,0 +1,244 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Appointment Details - Salon Admin{% endblock %}
+{% block page_title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Appointment #{{ appointment.id }}</h6>
+                <div>
+                    <a href="{{ url_for('admin_appointments.index') }}" 
+                       class="btn btn-sm btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold text-primary">Customer Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>{{ appointment.user.username if appointment.user else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>{{ appointment.user.email if appointment.user else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Phone:</strong></td>
+                                <td>{{ appointment.user.phone if appointment.user and appointment.user.phone else 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold text-primary">Appointment Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if appointment.status.value == 'pending' else 'success' if appointment.status.value == 'confirmed' else 'info' if appointment.status.value == 'in_progress' else 'secondary' if appointment.status.value == 'completed' else 'danger' }}">
+                                        {{ appointment.status.value.title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Date:</strong></td>
+                                <td>{{ appointment.date.strftime('%B %d, %Y') if appointment.date else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Time:</strong></td>
+                                <td>
+                                    {% if appointment.start_time and appointment.end_time %}
+                                        {{ appointment.start_time.strftime('%I:%M %p') }} - {{ appointment.end_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold text-primary">Service Details</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Service:</strong></td>
+                                <td>{{ appointment.service.name if appointment.service else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duration:</strong></td>
+                                <td>
+                                    {% if appointment.service and appointment.service.duration %}
+                                        {{ appointment.service.duration }} minutes
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Price:</strong></td>
+                                <td>
+                                    {% if appointment.service and appointment.service.price %}
+                                        ${{ "%.2f"|format(appointment.service.price) }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="font-weight-bold text-primary">Staff Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Staff:</strong></td>
+                                <td>{{ appointment.staff.name if appointment.staff else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Specialization:</strong></td>
+                                <td>{{ appointment.staff.specialization if appointment.staff and appointment.staff.specialization else 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Experience:</strong></td>
+                                <td>
+                                    {% if appointment.staff and appointment.staff.experience_years %}
+                                        {{ appointment.staff.experience_years }} years
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                {% if appointment.notes %}
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="font-weight-bold text-primary">Notes</h6>
+                        <p class="text-muted">{{ appointment.notes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if appointment.status.value == 'pending' %}
+                        <button class="btn btn-success" onclick="updateStatus('confirmed')">
+                            <i class="fas fa-check"></i> Confirm Appointment
+                        </button>
+                        <button class="btn btn-danger" onclick="updateStatus('cancelled')">
+                            <i class="fas fa-times"></i> Cancel Appointment
+                        </button>
+                    {% elif appointment.status.value == 'confirmed' %}
+                        <button class="btn btn-primary" onclick="updateStatus('completed')">
+                            <i class="fas fa-check-circle"></i> Mark as Completed
+                        </button>
+                        <button class="btn btn-danger" onclick="updateStatus('cancelled')">
+                            <i class="fas fa-times"></i> Cancel Appointment
+                        </button>
+                    {% elif appointment.status.value == 'completed' %}
+                        <div class="alert alert-success" role="alert">
+                            <i class="fas fa-check-circle"></i> <strong>Appointment Completed</strong>
+                        </div>
+                    {% elif appointment.status.value == 'cancelled' %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-times-circle"></i> <strong>Appointment Cancelled</strong>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Appointment History</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Created: {{ appointment.created_at.strftime('%B %d, %Y at %I:%M %p') if appointment.created_at else 'N/A' }}</p>
+                {% if appointment.updated_at and appointment.updated_at != appointment.created_at %}
+                <p class="text-muted">Last Updated: {{ appointment.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentAppointmentId = parseInt('{{ appointment.id }}');
+
+function updateStatus(status) {
+    // Show loading state by disabling all buttons
+    const buttons = document.querySelectorAll('.card-body button');
+    buttons.forEach(btn => btn.disabled = true);
+    
+    fetch(`/admin/appointments/${currentAppointmentId}/status`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: status })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message and reload page
+            showNotification('Status updated successfully!', 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            showNotification('Error: ' + (data.error || 'Failed to update status'), 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error: ' + error, 'error');
+    })
+    .finally(() => {
+        // Re-enable buttons
+        buttons.forEach(btn => btn.disabled = false);
+    });
+}
+
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}

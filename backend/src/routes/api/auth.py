@@ -60,6 +60,29 @@ def token_required(f):
     
     return decorated
 
+def optional_token_required(f):
+    """Decorator to optionally require JWT token - returns current_user or None"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        current_user = None
+        
+        # Check for token in Authorization header
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            try:
+                token = auth_header.split(" ")[1]  # Bearer <token>
+                
+                # Decode token to get user
+                data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+                current_user = User.get(id=data['user_id'])
+            except:
+                # Token is invalid or expired, treat as guest
+                pass
+        
+        return f(current_user, *args, **kwargs)
+    
+    return decorated
+
 def encode_jwt_token(payload):
     """Helper function to encode JWT token and ensure it's a string"""
     token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
