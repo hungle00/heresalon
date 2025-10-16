@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 from flask_migrate import Migrate
 from flask_cors import CORS
 
@@ -48,6 +48,16 @@ class Application:
         # Init Flask-Migrate
         # u.wait_for_service('postgres', 5432, timeout=30.0)
         self.migrate = Migrate(self.flask_app, self.db)
+        
+        # Add context processor for user info
+        @self.flask_app.context_processor
+        def inject_user():
+            from src.models import User
+            from src.models.user import UserRole
+            if 'admin_id' in session:
+                user = User.get(id=session['admin_id'])
+                return {'current_user': user, 'UserRole': UserRole}
+            return {'current_user': None, 'UserRole': UserRole}
 
     def init_routes(self):
 
