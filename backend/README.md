@@ -108,7 +108,7 @@ poetry run flask db migrate -m "Description"
 poetry run flask db upgrade
 
 # Check migration status
-poetry run flask db current
+poetry run flask db show
 ```
 
 
