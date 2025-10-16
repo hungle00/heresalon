@@ -10,4 +10,4 @@ def salons():
     """List all salons."""
     salons = Salon.query.all()
     
-    return render_template('admin/salons.html', salons=salons)
+    return render_template('admin/salons/salons.html', salons=salons)

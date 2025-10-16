@@ -33,6 +33,69 @@ def services():
     
     services = query.all()
     
-    return render_template('admin/services.html', 
+    return render_template('admin/services/services.html', 
                          services=services,
                          ServiceType=ServiceType)
+
+@blueprint.route('/services/new/', methods=['GET', 'POST'])
+@manager_or_admin_required
+def new_service():
+    """Create new service"""
+    if request.method == 'POST':
+        try:
+            service = Service.create(
+                name=request.form['name'],
+                type=request.form['type'],
+                price=Decimal(request.form['price']),
+                duration=int(request.form['duration']),
+                description=request.form.get('description', ''),
+                is_active=request.form.get('is_active') == 'on'
+            )
+            flash('Service created successfully!', 'success')
+            return redirect(url_for('admin_services.services'))
+        except Exception as e:
+            flash(f'Error creating service: {str(e)}', 'error')
+    
+    return render_template('admin/services/service_form.html', service=None, ServiceType=ServiceType)
+
+@blueprint.route('/services/<int:service_id>/edit/', methods=['GET', 'POST'])
+@manager_or_admin_required
+def edit_service(service_id):
+    """Edit service"""
+    service = Service.get(id=service_id)
+    if not service:
+        flash('Service not found!', 'error')
+        return redirect(url_for('admin_services.services'))
+    
+    if request.method == 'POST':
+        try:
+            service.name = request.form['name']
+            service.type = request.form['type']
+            service.price = Decimal(request.form['price'])
+            service.duration = int(request.form['duration'])
+            service.description = request.form.get('description', '')
+            service.is_active = request.form.get('is_active') == 'on'
+            service.save()
+            flash('Service updated successfully!', 'success')
+            return redirect(url_for('admin_services.services'))
+        except Exception as e:
+            flash(f'Error updating service: {str(e)}', 'error')
+    
+    return render_template('admin/services/service_form.html', service=service, ServiceType=ServiceType)
+
+@blueprint.route('/services/<int:service_id>/delete/', methods=['POST'])
+@manager_or_admin_required
+def delete_service(service_id):
+    """Delete service"""
+    service = Service.get(id=service_id)
+    if not service:
+        flash('Service not found!', 'error')
+        return redirect(url_for('admin_services.services'))
+    
+    try:
+        service.delete()
+        flash('Service deleted successfully!', 'success')
+    except Exception as e:
+        flash(f'Error deleting service: {str(e)}', 'error')
+    
+    return redirect(url_for('admin_services.services'))

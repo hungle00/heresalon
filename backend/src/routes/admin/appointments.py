@@ -58,7 +58,7 @@ def index():
     staffs = Staff.query.all()
     statuses = [status.value for status in AppointmentStatus]
     
-    return render_template('admin/appointments.html',
+    return render_template('admin/appointments/appointments.html',
                          appointments=appointments,
                          staffs=staffs,
                          statuses=statuses,
@@ -74,7 +74,7 @@ def index():
 def view(appointment_id):
     """View appointment details."""
     appointment = Appointment.query.get_or_404(appointment_id)
-    return render_template('admin/appointment_detail.html', appointment=appointment)
+    return render_template('admin/appointments/appointment_detail.html', appointment=appointment)
 
 @blueprint.route('/<int:appointment_id>/edit', methods=['GET', 'POST'])
 def edit(appointment_id):
@@ -118,7 +118,7 @@ def edit(appointment_id):
     services = Service.query.all()
     statuses = [status.value for status in AppointmentStatus]
     
-    return render_template('admin/appointment_edit.html',
+    return render_template('admin/appointments/appointment_edit.html',
                          appointment=appointment,
                          staffs=staffs,
                          services=services,
@@ -187,7 +187,7 @@ def calendar():
     # Get staff for filtering
     staffs = Staff.query.all()
     
-    return render_template('admin/appointments_calendar.html',
+    return render_template('admin/appointments/appointments_calendar.html',
                          appointments=appointments,
                          staffs=staffs,
                          current_year=year,
