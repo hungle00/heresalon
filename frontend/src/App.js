@@ -12,6 +12,7 @@ import StaffProfilePage from './pages/StaffProfilePage';
 import StaffCalendarPage from './pages/staffs/CalendarPage';
 import ProfileEditPage from './pages/staffs/ProfileEditPage';
 import BookingPage from './pages/BookingPage';
+import BookingInfoPage from './pages/BookingInfoPage';
 import ServiceDetailPage from './pages/services/ServiceDetailPage';
 
 function Navigation() {
@@ -122,6 +123,7 @@ function App() {
               <Route path="/staff/:id" element={<StaffProfilePage />} />
               <Route path="/staff/:id/edit" element={<ProfileEditPage />} />
               <Route path="/booking" element={<BookingPage />} />
+              <Route path="/booking-info" element={<BookingInfoPage />} />
               <Route 
                 path="/staff/calendar" 
                 element={
