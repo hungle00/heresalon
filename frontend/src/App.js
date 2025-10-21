@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginModal from './components/LoginModal';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
+import ChatWidget from './components/ChatWidget';
 
 // Import pages
 import HomePage from './pages/HomePage';
@@ -132,6 +133,8 @@ function App() {
               />
             </Routes>
           </main>
+          {/* Chat widget (global) */}
+          <ChatWidget />
         </div>
       </Router>
     </AuthProvider>
