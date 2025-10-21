@@ -3,9 +3,9 @@ from src.models.base import BaseModel, db
 
 
 class StaffRole(Enum):
-    STYLIST = "stylist"
-    MANAGER = "manager"
-    RECEPTIONIST = "receptionist"
+    STYLIST = 1
+    MANAGER = 2
+    RECEPTIONIST = 3
 
 
 class Seniority(Enum):
@@ -39,7 +39,6 @@ class Staff(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'uuid': self.uuid,
             'salon_id': self.salon_id,
             'name': self.name,
             'bio': self.bio,
