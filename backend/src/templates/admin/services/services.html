@@ -4,9 +4,11 @@
 {% block page_title %}Services{% endblock %}
 
 {% block page_actions %}
+{% if current_user and current_user.role != UserRole.ADMIN %}
 <a href="{{ url_for('admin_services.new_service') }}" class="btn btn-primary">
     <i class="fas fa-plus"></i> Add Service
 </a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -44,6 +46,7 @@
                         </td>
                         <td>{{ service.description[:50] + '...' if service.description and service.description|length > 50 else service.description or 'N/A' }}</td>
                         <td>
+                            {% if current_user and current_user.role != UserRole.ADMIN %}
                             <div class="btn-group" role="group">
                                 <a href="{{ url_for('admin_services.edit_service', service_id=service.id) }}" 
                                    class="btn btn-sm btn-outline-primary">
@@ -54,6 +57,9 @@
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
+                            {% else %}
+                            <span class="text-muted">View Only</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
