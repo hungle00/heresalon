@@ -8,6 +8,21 @@ from functools import wraps
 
 blueprint = Blueprint('auth', __name__, url_prefix='/api/auth')
 
+def add_cors_headers(response):
+    """Add CORS headers to response"""
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
+
+# Handle CORS preflight requests
+@blueprint.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = jsonify({'status': 'ok'})
+        return add_cors_headers(response)
+
 def token_required(f):
     """Decorator to require valid JWT token"""
     @wraps(f)
@@ -20,21 +35,49 @@ def token_required(f):
             try:
                 token = auth_header.split(" ")[1]  # Bearer <token>
             except IndexError:
-                return jsonify({'error': 'Invalid token format'}), 401
+                response = jsonify({'error': 'Invalid token format'})
+                return add_cors_headers(response), 401
         
         if not token:
-            return jsonify({'error': 'Token is missing'}), 401
+            response = jsonify({'error': 'Token is missing'})
+            return add_cors_headers(response), 401
         
         try:
             # Decode token
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.get(id=data['user_id'])
             if not current_user:
-                return jsonify({'error': 'User not found'}), 401
+                response = jsonify({'error': 'User not found'})
+                return add_cors_headers(response), 401
         except jwt.ExpiredSignatureError:
-            return jsonify({'error': 'Token has expired'}), 401
+            response = jsonify({'error': 'Token has expired'})
+            return add_cors_headers(response), 401
         except jwt.InvalidTokenError:
-            return jsonify({'error': 'Invalid token'}), 401
+            response = jsonify({'error': 'Invalid token'})
+            return add_cors_headers(response), 401
+        
+        return f(current_user, *args, **kwargs)
+    
+    return decorated
+
+def optional_token_required(f):
+    """Decorator to optionally require JWT token - returns current_user or None"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        current_user = None
+        
+        # Check for token in Authorization header
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            try:
+                token = auth_header.split(" ")[1]  # Bearer <token>
+                
+                # Decode token to get user
+                data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+                current_user = User.get(id=data['user_id'])
+            except:
+                # Token is invalid or expired, treat as guest
+                pass
         
         return f(current_user, *args, **kwargs)
     
@@ -43,7 +86,6 @@ def token_required(f):
 def encode_jwt_token(payload):
     """Helper function to encode JWT token and ensure it's a string"""
     token = jwt.encode(payload, current_app.config['SECRET_KEY'], algorithm='HS256')
-    # PyJWT 1.7.1 returns bytes, so we need to decode it
     if isinstance(token, bytes):
         return token.decode('utf-8')
     return token
@@ -54,12 +96,14 @@ def register():
     data = request.get_json()
     
     if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Email and password are required'}), 400
+        response = jsonify({'error': 'Email and password are required'})
+        return add_cors_headers(response), 400
     
     # Check if user already exists
     existing_user = User.query.filter_by(email=data['email']).first()
     if existing_user:
-        return jsonify({'error': 'User with this email already exists'}), 400
+        response = jsonify({'error': 'User with this email already exists'})
+        return add_cors_headers(response), 400
     
     try:
         # Create new user
@@ -76,14 +120,16 @@ def register():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         })
         
-        return jsonify({
+        response = jsonify({
             'message': 'User registered successfully',
             'token': token,
             'user': user.to_dict()
-        }), 201
+        })
+        return add_cors_headers(response), 201
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        response = jsonify({'error': str(e)})
+        return add_cors_headers(response), 400
 
 @blueprint.route('/login/', methods=['POST'])
 def login():
@@ -91,14 +137,16 @@ def login():
     data = request.get_json()
     
     if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Email and password are required'}), 400
+        response = jsonify({'error': 'Email and password are required'})
+        return add_cors_headers(response), 400
     
     try:
         # Find user by email
         user = User.query.filter_by(email=data['email']).first()
         
         if not user or not check_password_hash(user.password_hash, data['password']):
-            return jsonify({'error': 'Invalid email or password'}), 401
+            response = jsonify({'error': 'Invalid email or password'})
+            return add_cors_headers(response), 401
         
         # Generate JWT token
         token = encode_jwt_token({
@@ -106,47 +154,45 @@ def login():
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         })
         
-        return jsonify({
+        response = jsonify({
             'message': 'Login successful',
             'token': token,
             'user': user.to_dict()
-        }), 200
+        })
+        return add_cors_headers(response), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        response = jsonify({'error': str(e)})
+        return add_cors_headers(response), 400
 
 @blueprint.route('/logout/', methods=['POST'])
 @token_required
 def logout(current_user):
     """Logout user (client should remove token)"""
-    return jsonify({'message': 'Logout successful'}), 200
+    response = jsonify({'message': 'Logout successful'})
+    return add_cors_headers(response), 200
 
 @blueprint.route('/me/', methods=['GET'])
 @token_required
 def get_current_user(current_user):
     """Get current user information"""
-    return jsonify({
-        'user': current_user.to_dict()
-    }), 200
+    response = jsonify(current_user.to_dict())
+    return add_cors_headers(response), 200
 
 @blueprint.route('/refresh/', methods=['POST'])
 @token_required
 def refresh_token(current_user):
     """Refresh JWT token"""
-    try:
-        # Generate new JWT token
-        token = encode_jwt_token({
-            'user_id': current_user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-        })
-        
-        return jsonify({
-            'message': 'Token refreshed successfully',
-            'token': token
-        }), 200
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+    token = encode_jwt_token({
+        'user_id': current_user.id,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    })
+    
+    response = jsonify({
+        'message': 'Token refreshed successfully',
+        'token': token
+    })
+    return add_cors_headers(response), 200
 
 @blueprint.route('/change-password/', methods=['POST'])
 @token_required
@@ -155,18 +201,22 @@ def change_password(current_user):
     data = request.get_json()
     
     if not data or not data.get('current_password') or not data.get('new_password'):
-        return jsonify({'error': 'Current password and new password are required'}), 400
+        response = jsonify({'error': 'Current password and new password are required'})
+        return add_cors_headers(response), 400
+    
+    # Verify current password
+    if not check_password_hash(current_user.password_hash, data['current_password']):
+        response = jsonify({'error': 'Current password is incorrect'})
+        return add_cors_headers(response), 401
     
     try:
-        # Verify current password
-        if not check_password_hash(current_user.password_hash, data['current_password']):
-            return jsonify({'error': 'Current password is incorrect'}), 401
-        
         # Update password
         current_user.password_hash = generate_password_hash(data['new_password'])
-        current_user.save()
+        db.session.commit()
         
-        return jsonify({'message': 'Password changed successfully'}), 200
+        response = jsonify({'message': 'Password changed successfully'})
+        return add_cors_headers(response), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        response = jsonify({'error': str(e)})
+        return add_cors_headers(response), 400

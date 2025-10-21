@@ -75,7 +75,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {% if 'appointments' in request.endpoint %}active{% endif %}" 
-                               href="{{ url_for('admin_salons.salons') }}">
+                               href="{{ url_for('admin_appointments.index') }}">
                                 <i class="fas fa-calendar"></i> Appointments
                             </a>
                         </li>
@@ -135,6 +135,7 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
