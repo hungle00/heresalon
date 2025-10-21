@@ -41,3 +41,7 @@ class Settings:
             },
         }
     }
+    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")  # either "openai" or "gemini"
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") 
+    # TODO: 
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
