@@ -4,9 +4,11 @@
 {% block page_title %}Staff{% endblock %}
 
 {% block page_actions %}
+{% if current_user and current_user.role != UserRole.ADMIN %}
 <a href="{{ url_for('admin_staff.new_staff') }}" class="btn btn-primary">
     <i class="fas fa-plus"></i> Add Staff
 </a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -50,6 +52,7 @@
                             {% endif %}
                         </td>
                         <td>
+                            {% if current_user and current_user.role != UserRole.ADMIN %}
                             <div class="btn-group" role="group">
                                 <a href="{{ url_for('admin_staff.edit_staff', staff_id=member.id) }}" 
                                    class="btn btn-sm btn-outline-primary">
@@ -60,6 +63,9 @@
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
+                            {% else %}
+                            <span class="text-muted">View Only</span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

@@ -1,0 +1,230 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Salon Details - {{ salon.name }}{% endblock %}
+
+{% block page_title %}Salon Details{% endblock %}
+
+{% block page_actions %}
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('admin_salons.salons') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Salons
+        </a>
+        {% if current_user and current_user.role == UserRole.ADMIN %}
+        <a href="{{ url_for('admin_salons.edit_salon', salon_id=salon.id) }}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Salon
+        </a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <!-- Salon Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-store"></i> {{ salon.name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Basic Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td>{{ salon.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Address:</strong></td>
+                                <td>{{ salon.address or 'Not specified' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Description:</strong></td>
+                                <td>{{ salon.description or 'No description' }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Created:</strong></td>
+                                <td>{{ salon.created_at.strftime('%Y-%m-%d %H:%M') if salon.created_at else 'Unknown' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Working Hours</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td><strong>Monday - Friday:</strong></td>
+                                <td>9:00 AM - 7:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Saturday:</strong></td>
+                                <td>9:00 AM - 5:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sunday:</strong></td>
+                                <td>10:00 AM - 4:00 PM</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lunch Break:</strong></td>
+                                <td>12:00 PM - 1:00 PM</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff Members -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-user-tie"></i> Staff Members ({{ salon.staffs|length }})
+                </h5>
+                <a href="{{ url_for('admin_staff.staff') }}?salon_id={{ salon.id }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if salon.staffs %}
+                <div class="row">
+                    {% for staff in salon.staffs[:6] %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ staff.name }}</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-briefcase"></i> {{ staff.role.value if staff.role else 'No role' }}
+                                        {% if staff.seniority %}
+                                        | <i class="fas fa-star"></i> {{ staff.seniority.value }}
+                                        {% endif %}
+                                    </small>
+                                </p>
+                                {% if staff.specialties %}
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-tags"></i> {{ staff.specialties }}
+                                    </small>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if salon.staffs|length > 6 %}
+                <div class="text-center">
+                    <a href="{{ url_for('admin_staff.staff') }}?salon_id={{ salon.id }}" class="btn btn-outline-primary">
+                        View All {{ salon.staffs|length }} Staff Members
+                    </a>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center text-muted">
+                    <i class="fas fa-user-tie fa-3x mb-3"></i>
+                    <p>No staff members assigned to this salon yet.</p>
+                    {% if current_user and current_user.role == UserRole.MANAGER %}
+                    <a href="{{ url_for('admin_staff.new_staff') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Staff Member
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-cogs"></i> Services ({{ salon.services|length }})
+                </h5>
+                <a href="{{ url_for('admin_services.services') }}?salon_id={{ salon.id }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i> View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if salon.services %}
+                <div class="row">
+                    {% for service in salon.services[:6] %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ service.name }}</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-dollar-sign"></i> ${{ "%.2f"|format(service.price) }}
+                                        {% if service.duration %}
+                                        | <i class="fas fa-clock"></i> {{ service.duration }} min
+                                        {% endif %}
+                                    </small>
+                                </p>
+                                {% if service.description %}
+                                <p class="card-text">
+                                    <small class="text-muted">{{ service.description[:100] }}{% if service.description|length > 100 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if salon.services|length > 6 %}
+                <div class="text-center">
+                    <a href="{{ url_for('admin_services.services') }}?salon_id={{ salon.id }}" class="btn btn-outline-primary">
+                        View All {{ salon.services|length }} Services
+                    </a>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="text-center text-muted">
+                    <i class="fas fa-cogs fa-3x mb-3"></i>
+                    <p>No services available for this salon yet.</p>
+                    {% if current_user and current_user.role == UserRole.MANAGER %}
+                    <a href="{{ url_for('admin_services.new_service') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Service
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-bolt"></i> Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin_appointments.index') }}?salon_id={{ salon.id }}" class="btn btn-outline-primary">
+                        <i class="fas fa-calendar"></i> View Appointments
+                    </a>
+                    <a href="{{ url_for('admin_salons.edit_salon', salon_id=salon.id) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit Salon
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salon Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i> Salon Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>UUID:</strong> {{ salon.uuid or 'Not set' }}</p>
+                <p><strong>ID:</strong> {{ salon.id }}</p>
+                <p><strong>Created:</strong> {{ salon.created_at.strftime('%Y-%m-%d %H:%M') if salon.created_at else 'Unknown' }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
