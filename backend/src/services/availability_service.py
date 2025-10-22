@@ -1,9 +1,8 @@
 from datetime import datetime, date, timedelta
 from typing import List, Dict, Optional, Tuple
 from sqlalchemy import and_, or_
-from src.models import db, Appointment, Staff, WorkingHour
+from src.models import db, Appointment, Staff
 from src.models.appointment import AppointmentStatus
-
 
 class AvailabilityService:
     """Service class for handling appointment availability logic.
@@ -61,34 +60,6 @@ class AvailabilityService:
                 'status': conflict.status.value
             } for conflict in conflicts]
         }
-    
-    @staticmethod
-    def get_staff_working_hours(staff_id: int, appointment_date: date) -> List[Dict]:
-        """
-        Get working hours for a staff member on a specific date.
-        
-        Args:
-            staff_id: ID of the staff member
-            appointment_date: Date to check
-            
-        Returns:
-            List of working hour periods
-        """
-        # Get day of week (0 = Monday, 6 = Sunday)
-        day_of_week = appointment_date.weekday()
-        
-        working_hours = WorkingHour.query.filter(
-            and_(
-                WorkingHour.staff_id == staff_id,
-                WorkingHour.day_of_week == day_of_week
-            )
-        ).all()
-        
-        return [{
-            'start_time': wh.start_time.strftime('%H:%M'),
-            'end_time': wh.end_time.strftime('%H:%M'),
-            'is_available': wh.is_available
-        } for wh in working_hours]
     
     @staticmethod
     def get_available_time_slots(
