@@ -12,6 +12,12 @@ blueprint = Blueprint('admin_appointments', __name__, url_prefix='/admin/appoint
 @manager_or_admin_required
 def index():
     """Display all appointments with filtering and pagination."""
+    from flask import session
+    from src.models import User
+    
+    # Get current user
+    current_user = User.get(id=session['admin_id'])
+    
     page = request.args.get('page', 1, type=int)
     per_page = 20
     
@@ -21,8 +27,17 @@ def index():
     staff_filter = request.args.get('staff', '')
     search = request.args.get('search', '')
     
-    # Build query
-    query = Appointment.query.join(Staff).outerjoin(User).join(Service)
+    # Build query based on user role
+    if current_user.role == UserRole.ADMIN:
+        # Admin sees all appointments
+        query = Appointment.query.join(Staff).outerjoin(User).join(Service)
+    else:
+        # Manager sees only appointments from their salon
+        if not current_user.salon_id:
+            flash('Manager must be assigned to a salon!', 'error')
+            return redirect(url_for('admin_dashboard.dashboard'))
+        
+        query = Appointment.query.join(Staff).filter(Staff.salon_id == current_user.salon_id).outerjoin(User).join(Service)
     
     # Apply filters
     if status_filter:
@@ -54,11 +69,15 @@ def index():
     # Paginate
     appointments = query.all()
     
-    # Get filter options
-    staffs = Staff.query.all()
+    # Get filter options based on user role
+    if current_user.role == UserRole.ADMIN:
+        staffs = Staff.query.all()
+    else:
+        staffs = Staff.query.filter_by(salon_id=current_user.salon_id).all()
+    
     statuses = [status.value for status in AppointmentStatus]
     
-    return render_template('admin/appointments.html',
+    return render_template('admin/appointments/appointments.html',
                          appointments=appointments,
                          staffs=staffs,
                          statuses=statuses,
@@ -74,7 +93,7 @@ def index():
 def view(appointment_id):
     """View appointment details."""
     appointment = Appointment.query.get_or_404(appointment_id)
-    return render_template('admin/appointment_detail.html', appointment=appointment)
+    return render_template('admin/appointments/appointment_detail.html', appointment=appointment)
 
 @blueprint.route('/<int:appointment_id>/edit', methods=['GET', 'POST'])
 def edit(appointment_id):
@@ -118,7 +137,7 @@ def edit(appointment_id):
     services = Service.query.all()
     statuses = [status.value for status in AppointmentStatus]
     
-    return render_template('admin/appointment_edit.html',
+    return render_template('admin/appointments/appointment_edit.html',
                          appointment=appointment,
                          staffs=staffs,
                          services=services,
@@ -187,7 +206,7 @@ def calendar():
     # Get staff for filtering
     staffs = Staff.query.all()
     
-    return render_template('admin/appointments_calendar.html',
+    return render_template('admin/appointments/appointments_calendar.html',
                          appointments=appointments,
                          staffs=staffs,
                          current_year=year,

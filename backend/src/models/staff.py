@@ -19,6 +19,7 @@ class Staff(BaseModel):
     __tablename__ = 'staffs'
 
     salon_id = db.Column(db.Integer, db.ForeignKey('salons.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Optional user account
     name = db.Column(db.String(100), nullable=False)
     bio = db.Column(db.Text, nullable=True)
     role = db.Column(db.Integer, nullable=False)  # Staff role as integer
@@ -30,6 +31,7 @@ class Staff(BaseModel):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     # Relationships
+    user = db.relationship('User', backref='staff_profile', lazy=True)
     appointments = db.relationship('Appointment', backref='staff', lazy=True)
     working_hours = db.relationship('WorkingHour', backref='staff', lazy=True)
 
@@ -40,6 +42,7 @@ class Staff(BaseModel):
         return {
             'id': self.id,
             'salon_id': self.salon_id,
+            'user_id': self.user_id,
             'name': self.name,
             'bio': self.bio,
             'role': self.role,

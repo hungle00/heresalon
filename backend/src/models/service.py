@@ -15,14 +15,15 @@ class ServiceType(Enum):
 class Service(BaseModel):
     __tablename__ = 'services'
 
+    salon_id = db.Column(db.Integer, db.ForeignKey('salons.id'), nullable=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     type = db.Column(db.Enum(ServiceType), nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=True)
+    duration = db.Column(db.Integer, nullable=True)  # Duration in minutes
     image_url = db.Column(db.String(255), nullable=True)
 
     # Relationships
-    salon_services = db.relationship('SalonService', backref='service', lazy=True)
     appointments = db.relationship('Appointment', backref='service', lazy=True)
 
     def __repr__(self):
@@ -31,9 +32,11 @@ class Service(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
+            'salon_id': self.salon_id,
             'name': self.name,
             'description': self.description,
             'type': self.type.value,
             'price': float(self.price) if self.price else None,
+            'duration': self.duration,
             'image_url': self.image_url
         }
