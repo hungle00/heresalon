@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request
 
-from src.routes.api.bot import chat_with_bot, SYSTEM_PROMPT
+from src.services.chatbot_service import ChatBotService
+
+_chatbot = ChatBotService()
+
+
 
 blueprint = Blueprint("chat", __name__, url_prefix="/api")
 
@@ -27,6 +31,11 @@ def chat():
     if user_message:
         conversation.append({"role": "user", "content": user_message})
     # Delegate to the chat bot
-    assistant_msg = chat_with_bot(conversation, user_id=user_id)
+    assistant_msg =  _chatbot.chat(conversation, user_id=user_id)
     print(f"Assistant message: {assistant_msg}")
     return jsonify(assistant_msg)
+  
+  
+
+
+

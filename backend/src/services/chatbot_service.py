@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 from datetime import datetime, date, time
 from typing import Any, Dict, List, Optional
@@ -60,20 +58,17 @@ class ChatBotService:
         "- Use `list_services` to list salon services.\n"
         "- Use `list_staff` to list staff members. If `service_id` is given, only staff in that service’s salon.\n"
         "- Use `find_available_staff` to suggest staff for a service at a specific date/time window.\n"
-        "- Use `get_appointments` to retrieve the user’s upcoming appointments.\n"
+        "- Use `get_appointments` to retrieve the user’s appointments.\n"
+        "- Use `get_current_appointments` to retrieve upcoming appointments only.\n"
         "- Use `create_appointment` to book only after explicit confirmation.\n"
-        "\n"
+        "- Use `update_appointment` to modify an existing appointment (confirm the new details first).\n"
+        "- Use `delete_appointment` to cancel an existing appointment (confirm the id/date/time first).\n"
         "BOOKING FLOW\n"
         "1) If details are missing (service, date, start/end time, preferred staff), ask for them in the customer’s language.\n"
         "2) When suggesting times, provide 1–3 options if possible.\n"
-        "3) Before calling `create_appointment`, summarize and confirm all fields:\n"
-        "   • Service: <name>\n"
-        "   • Staff: <name or 'any available'>\n"
-        "   • Date: YYYY-MM-DD\n"
-        "   • Start: HH:MM\n"
-        "   • End: HH:MM\n"
-        "   • Phone (guests only): <number>\n"
-        "   Ask the customer to confirm or specify changes.\n"
+        "3) Before calling a write tool, summarize and ask to confirm:\n"
+        "   • For create/update: Service, Staff, Date, Start, End, Phone (guests only)\n"
+        "   • For delete: Appointment ID (and show date/time)\n"
         "4) For guests (no user_id), collect a phone number and include it in `create_appointment`.\n"
         "\n"
         "ERROR HANDLING\n"
@@ -187,6 +182,52 @@ class ChatBotService:
                 },
             },
         },
+        {
+            "type": "function",
+            "function": {
+                "name": "get_current_appointments",
+                "description": "Get upcoming appointments (start_time >= now) for the current user.",
+                "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "update_appointment",
+                "description": (
+                    "Update an appointment owned by the current user (date/start_time/end_time/status). "
+                    "All times are HH:MM 24h; date is YYYY-MM-DD. Confirms no time conflicts."
+                ),
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "appointment_id": {"type": "integer"},
+                        "date": {"type": "string", "nullable": True, "description": "YYYY-MM-DD"},
+                        "start_time": {"type": "string", "nullable": True, "description": "HH:MM (24h)"},
+                        "end_time": {"type": "string", "nullable": True, "description": "HH:MM (24h)"},
+                        "status": {"type": "string", "nullable": True, "enum": ["pending","confirmed","completed","canceled"]},
+                        "customer_phone": {"type": "string", "nullable": True, "description": "Optional; overrides saved phone for SMS"},
+                    },
+                    "required": ["appointment_id"],
+                },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "delete_appointment",
+                "description": "Delete/cancel an appointment owned by the current user.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "appointment_id": {"type": "integer"},
+                        "customer_phone": {"type": "string", "nullable": True, "description": "Optional; overrides saved phone for SMS"},
+                    },
+                    "required": ["appointment_id"],
+                },
+            },
+        },        
+        
     ]
 
     def __init__(self) -> None:
@@ -226,8 +267,6 @@ class ChatBotService:
         return [appt.to_dict() for appt in appointments]
 
     def _tool_create_appointment(self, args: Dict[str, Any], user_id: Optional[int]) -> Any:
-        """Create a new appointment and return the resulting object or error."""
-        # The AppointmentService expects snake_case keys and validated data.
         data: Dict[str, Any] = {
             "staff_id": args.get("staff_id"),
             "service_id": args.get("service_id"),
@@ -235,70 +274,81 @@ class ChatBotService:
             "start_time": args.get("start_time"),
             "end_time": args.get("end_time"),
         }
-        # Optional fields
         if args.get("customer_phone"):
             data["customer_phone"] = args["customer_phone"]
+
         appointment, error = AppointmentService.create_appointment(data, user_id)
-        # If an error occurred during creation, return it immediately
         if error:
             return {"error": error}
-        # At this point the appointment was created successfully.  Send a
-        # confirmation SMS if a phone number is available and Twilio is
-        # configured.  We attempt to determine the recipient phone number
-        # from the provided data (for guests) or, if the user is
-        # authenticated, from the User model.
+
+        # ✅ send SMS via AppointmentService
         try:
-            # Determine the phone number: start with explicit customer_phone
-            phone_number: Optional[str] = data.get("customer_phone")
-            # If no phone provided and the user is logged in, try to load
-            # the user’s phone number from the database.  This code uses
-            # dynamic import to avoid a hard dependency when the User model
-            # is not available in the testing environment.
-            if not phone_number and user_id is not None:
-                try:
-                    from src.models.user import User  # type: ignore
-                    user = User.get(id=user_id)
-                    if user and getattr(user, "phone_number", None):
-                        phone_number = user.phone_number  # type: ignore[attr-defined]
-                except Exception:
-                    # If the User model or phone_number lookup fails, we
-                    # silently ignore; the SMS will simply not be sent.
-                    pass
-            # If we have a phone number and Twilio client is available,
-            # attempt to send the confirmation message.
-            if phone_number and Client is not None:
-                if Settings.TWILIO_ACCOUNT_SID and Settings.TWILIO_AUTH_TOKEN and Settings.TWILIO_PHONE_NUMBER:
-                    try:
-                        twilio_client = Client(Settings.TWILIO_ACCOUNT_SID, Settings.TWILIO_AUTH_TOKEN)
-                        appt_dict = appointment.to_dict() if hasattr(appointment, "to_dict") else None
-                        msg_date = (appt_dict.get("date") if appt_dict else data.get("date")) or ""
-                        msg_start = (appt_dict.get("start_time") if appt_dict else data.get("start_time")) or ""
-                        msg_end = (appt_dict.get("end_time") if appt_dict else data.get("end_time")) or ""
-                        message_body = f"Your appointment at HereSalon is confirmed for {msg_date} from {msg_start} to {msg_end}. We look forward to seeing you!"
-                        twilio_client.messages.create(
-                            body=message_body,
-                            from_=Settings.TWILIO_PHONE_NUMBER,
-                            to=phone_number,
-                        )
-                    except Exception as sms_err:
-                        # Log Twilio errors rather than interrupting the flow
-                        current_app.logger.error(f"Twilio SMS sending failed: {sms_err}")
-                else:
-                    current_app.logger.warning(
-                        "Twilio credentials are missing; skipping SMS confirmation."
-                    )
+            AppointmentService.send_confirmation(
+                appointment=appointment,
+                action="created",
+                user_id=user_id,
+                customer_phone=args.get("customer_phone"),
+            )
         except Exception as e:
-            # Catch all exceptions during SMS sending so appointment creation is not affected
-            current_app.logger.error(f"Error while sending confirmation SMS: {e}")
-        # Finally return the appointment as a dictionary
-        return appointment.to_dict() if appointment else {"error": "Unknown error"}
- 
+            current_app.logger.error(f"SMS (create) failed: {e}")
 
+        return appointment.to_dict()
 
-        appointment, error = AppointmentService.create_appointment(data, user_id)
-        if error:
-            return {"error": error}
-        return appointment.to_dict() if appointment else {"error": "Unknown error"}
+    def _tool_update_appointment(self, args: Dict[str, Any], user_id: Optional[int]) -> Any:
+        appt_id = args.get("appointment_id")
+        if not appt_id:
+            return {"error": "appointment_id is required"}
+
+        # Prepare update payload (only include provided keys)
+        payload: Dict[str, Any] = {}
+        for k in ("date", "start_time", "end_time", "status"):
+            if args.get(k) is not None:
+                payload[k] = args[k]
+
+        appt, err = AppointmentService.update_appointment(appt_id, payload, user_id)
+        if err:
+            return {"error": err}
+
+        # ✅ send SMS via AppointmentService
+        try:
+            AppointmentService.send_confirmation(
+                appointment=appt,
+                action="updated",
+                user_id=user_id,
+                customer_phone=args.get("customer_phone"),
+            )
+        except Exception as e:
+            current_app.logger.error(f"SMS (update) failed: {e}")
+
+        return appt.to_dict()
+
+    def _tool_delete_appointment(self, args: Dict[str, Any], user_id: Optional[int]) -> Any:
+        appt_id = args.get("appointment_id")
+        if not appt_id:
+            return {"error": "appointment_id is required"}
+
+        # Fetch appointment first to craft message after deletion
+        appt_before, err = AppointmentService.get_appointment_by_id(appt_id, user_id)
+        if err:
+            return {"error": err}
+
+        ok, del_err = AppointmentService.delete_appointment(appt_id, user_id)
+        if not ok:
+            return {"error": del_err or "Failed to delete appointment"}
+
+        # ✅ send SMS via AppointmentService using details from appt_before
+        try:
+            if appt_before:
+                AppointmentService.send_confirmation(
+                    appointment=appt_before,
+                    action="deleted",
+                    user_id=user_id,
+                    customer_phone=args.get("customer_phone"),
+                )
+        except Exception as e:
+            current_app.logger.error(f"SMS (delete) failed: {e}")
+
+        return {"success": True, "deleted_appointment_id": appt_id}
 
     def _tool_list_services(self, args: Dict[str, Any], user_id: Optional[int]) -> Any:
         """Return a list of services, optionally filtered by salon."""
@@ -454,8 +504,14 @@ class ChatBotService:
         try:
             if name == "get_appointments":
                 return self._tool_get_appointments(args, user_id)
+            if name == "get_current_appointments":
+                return self._tool_get_current_appointments(args, user_id)
             if name == "create_appointment":
                 return self._tool_create_appointment(args, user_id)
+            if name == "update_appointment":
+                return self._tool_update_appointment(args, user_id)
+            if name == "delete_appointment":
+                return self._tool_delete_appointment(args, user_id)
             if name == "list_services":
                 return self._tool_list_services(args, user_id)
             if name == "list_staff":
