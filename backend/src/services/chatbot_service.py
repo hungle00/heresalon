@@ -19,7 +19,7 @@ try:
     import google.generativeai as genai  # type: ignore
 except ImportError:
     genai = None  # optional Gemini support
-
+from twilio.rest import Client
 
 class ChatBotService:
     """Conversational assistant for HereSalon.
@@ -238,6 +238,63 @@ class ChatBotService:
         # Optional fields
         if args.get("customer_phone"):
             data["customer_phone"] = args["customer_phone"]
+        appointment, error = AppointmentService.create_appointment(data, user_id)
+        # If an error occurred during creation, return it immediately
+        if error:
+            return {"error": error}
+        # At this point the appointment was created successfully.  Send a
+        # confirmation SMS if a phone number is available and Twilio is
+        # configured.  We attempt to determine the recipient phone number
+        # from the provided data (for guests) or, if the user is
+        # authenticated, from the User model.
+        try:
+            # Determine the phone number: start with explicit customer_phone
+            phone_number: Optional[str] = data.get("customer_phone")
+            # If no phone provided and the user is logged in, try to load
+            # the user’s phone number from the database.  This code uses
+            # dynamic import to avoid a hard dependency when the User model
+            # is not available in the testing environment.
+            if not phone_number and user_id is not None:
+                try:
+                    from src.models.user import User  # type: ignore
+                    user = User.get(id=user_id)
+                    if user and getattr(user, "phone_number", None):
+                        phone_number = user.phone_number  # type: ignore[attr-defined]
+                except Exception:
+                    # If the User model or phone_number lookup fails, we
+                    # silently ignore; the SMS will simply not be sent.
+                    pass
+            # If we have a phone number and Twilio client is available,
+            # attempt to send the confirmation message.
+            if phone_number and Client is not None:
+                if Settings.TWILIO_ACCOUNT_SID and Settings.TWILIO_AUTH_TOKEN and Settings.TWILIO_PHONE_NUMBER:
+                    try:
+                        twilio_client = Client(Settings.TWILIO_ACCOUNT_SID, Settings.TWILIO_AUTH_TOKEN)
+                        appt_dict = appointment.to_dict() if hasattr(appointment, "to_dict") else None
+                        msg_date = (appt_dict.get("date") if appt_dict else data.get("date")) or ""
+                        msg_start = (appt_dict.get("start_time") if appt_dict else data.get("start_time")) or ""
+                        msg_end = (appt_dict.get("end_time") if appt_dict else data.get("end_time")) or ""
+                        message_body = f"Your appointment at HereSalon is confirmed for {msg_date} from {msg_start} to {msg_end}. We look forward to seeing you!"
+                        twilio_client.messages.create(
+                            body=message_body,
+                            from_=Settings.TWILIO_PHONE_NUMBER,
+                            to=phone_number,
+                        )
+                    except Exception as sms_err:
+                        # Log Twilio errors rather than interrupting the flow
+                        current_app.logger.error(f"Twilio SMS sending failed: {sms_err}")
+                else:
+                    current_app.logger.warning(
+                        "Twilio credentials are missing; skipping SMS confirmation."
+                    )
+        except Exception as e:
+            # Catch all exceptions during SMS sending so appointment creation is not affected
+            current_app.logger.error(f"Error while sending confirmation SMS: {e}")
+        # Finally return the appointment as a dictionary
+        return appointment.to_dict() if appointment else {"error": "Unknown error"}
+ 
+
+
         appointment, error = AppointmentService.create_appointment(data, user_id)
         if error:
             return {"error": error}
