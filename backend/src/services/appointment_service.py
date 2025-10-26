@@ -5,7 +5,8 @@ from flask import current_app
 
 from src.models import Appointment, Staff, Service, User
 from src.models.appointment import AppointmentStatus
-
+from src.settings import Settings  
+from twilio.rest import Client
 
 class AppointmentService:
     """Service class for appointment operations that can be reused across API and chatbot"""
@@ -321,3 +322,88 @@ class AppointmentService:
         except Exception as e:
             return f"Error checking time conflicts: {str(e)}"
 
+    @staticmethod
+    def _lookup_phone(user_id: Optional[int], fallback: Optional[str] = None) -> Optional[str]:
+        """Resolve phone number via explicit fallback or User model."""
+        if fallback:
+            return fallback
+        if user_id:
+            try:
+                user = User.get(id=user_id)
+                if user and getattr(user, "phone_number", None):
+                    return user.phone_number  # type: ignore[attr-defined]
+            except Exception as e:
+                current_app.logger.warning(f"Phone lookup failed: {e}")
+        return None
+
+    @staticmethod
+    def _format_time(dt: Optional[datetime]) -> str:
+        try:
+            return dt.strftime("%H:%M") if dt else ""
+        except Exception:
+            return ""
+
+    @staticmethod
+    def build_confirmation_message(action: str, appt: Appointment) -> str:
+        """
+        Build a short, consistent confirmation message for SMS across create/update/delete.
+        """
+        # Use Appointment fields safely
+        appt_date = getattr(appt, "date", None)
+        appt_start = getattr(appt, "start_time", None)
+        appt_end = getattr(appt, "end_time", None)
+
+        date_str = appt_date.isoformat() if isinstance(appt_date, date) else ""
+        start_str = AppointmentService._format_time(appt_start)
+        end_str = AppointmentService._format_time(appt_end)
+
+        if action == "deleted":
+            return f"Your HereSalon appointment on {date_str} ({start_str}-{end_str}) has been canceled. If this is unexpected, reply or call us."
+        elif action == "updated":
+            return f"Your HereSalon appointment was updated: {date_str} from {start_str} to {end_str}. See you soon!"
+        else:  # created / default
+            return f"Your HereSalon appointment is confirmed for {date_str} from {start_str} to {end_str}. We look forward to seeing you!"
+
+    @staticmethod
+    def send_message(phone_number: str, body: str) -> bool:
+        """
+        Generic Twilio SMS sender. Returns True on success, False otherwise.
+        Safe to call even if Twilio is not configured.
+        """
+        if not phone_number:
+            current_app.logger.info("No phone number provided; skipping SMS.")
+            return False
+
+        if not (Settings.TWILIO_ACCOUNT_SID and Settings.TWILIO_AUTH_TOKEN and Settings.TWILIO_PHONE_NUMBER):
+            current_app.logger.warning("Twilio credentials are missing; skipping SMS confirmation.")
+            return False
+
+        if Client is None:
+            current_app.logger.warning("twilio SDK not installed; skipping SMS confirmation.")
+            return False
+
+        try:
+            twilio_client = Client(Settings.TWILIO_ACCOUNT_SID, Settings.TWILIO_AUTH_TOKEN)
+            twilio_client.messages.create(
+                body=body,
+                from_=Settings.TWILIO_PHONE_NUMBER,
+                to=phone_number,
+            )
+            return True
+        except Exception as sms_err:
+            current_app.logger.error(f"Twilio SMS sending failed: {sms_err}")
+            return False
+
+    @staticmethod
+    def send_confirmation(appointment: Appointment, action: str,
+                          user_id: Optional[int] = None,
+                          customer_phone: Optional[str] = None) -> None:
+        """
+        Resolve phone, build message for action ('created'|'updated'|'deleted'), and send it.
+        """
+        try:
+            phone = AppointmentService._lookup_phone(user_id, customer_phone) or getattr(appointment, "phone_number", None)
+            body = AppointmentService.build_confirmation_message(action, appointment)
+            AppointmentService.send_message(phone or "", body)
+        except Exception as e:
+            current_app.logger.error(f"Error while sending confirmation SMS: {e}")
