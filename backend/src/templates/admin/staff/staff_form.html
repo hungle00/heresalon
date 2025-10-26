@@ -42,15 +42,6 @@
                         <div class="col-md-6">
                             <div class="form-group mb-3">
                                 <label for="salon_id" class="form-label">Salon *</label>
-                                <select class="form-control" id="salon_id" name="salon_id" required>
-                                    <option value="">Select Salon</option>
-                                    {% for salon in salons %}
-                                        <option value="{{ salon.id }}" 
-                                                {{ 'selected' if staff and staff.salon_id == salon.id else '' }}>
-                                            {{ salon.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
                             </div>
                         </div>
                         <div class="col-md-6">
