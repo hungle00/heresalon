@@ -75,3 +75,19 @@ curl -X POST "$BASE" \
 #   "conversation": [],
 #   "message": "I’d like Gel-X on 2025-10-29 from 13:00 to 15:00. Any artist is OK."
 # }'
+
+curl -X POST "$BASE" -H "Content-Type: application/json" -d '{
+  "conversation": [],
+  "message": "I want to book a Gel Manicure on 2025-10-28 from 15:00 to 16:00. Any staff is okay.",
+  "user_id": 1
+}'
+
+
+
+curl -X POST "$BASE" -H "Content-Type: application/json" -d "{
+  \"conversation\": [
+    {\"role\": \"assistant\", \"content\": \"Please confirm: Service: Gel Manicure; Staff: Linh Phan; Date: 2025-10-28; Start: 15:00; End: 16:00. Shall I book it?\"}
+  ],
+  \"message\": \"Yes, please confirm the booking.\",
+  \"user_id\": 1
+}"
