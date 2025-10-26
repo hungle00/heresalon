@@ -10,7 +10,7 @@ blueprint = Blueprint('users', __name__, url_prefix='/admin')
 def users():
     """List all users"""
     users = User.list()
-    return render_template('admin/users.html', users=users)
+    return render_template('admin/users/users.html', users=users)
 
 @blueprint.route('/users/new/', methods=['GET', 'POST'])
 @admin_required
@@ -29,7 +29,7 @@ def new_user():
         except Exception as e:
             flash(f'Error creating user: {str(e)}', 'error')
     
-    return render_template('admin/user_form.html', user=None)
+    return render_template('admin/users/user_form.html', user=None)
 
 @blueprint.route('/users/<int:user_id>/edit/', methods=['GET', 'POST'])
 @admin_required
@@ -51,4 +51,4 @@ def edit_user(user_id):
         except Exception as e:
             flash(f'Error updating user: {str(e)}', 'error')
     
-    return render_template('admin/user_form.html', user=user)
+    return render_template('admin/users/user_form.html', user=user)
