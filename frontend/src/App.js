@@ -109,6 +109,36 @@ function Navigation() {
 }
 
 function App() {
+  // Example callbacks for ChatWidget: you can replace sendMessageToApi with your real API
+  const handleDispatch = (userMsg) => {
+    // Called immediately when user sends a message
+    console.log('Dispatched message:', userMsg);
+  };
+
+  const sendMessageToApi = async (userMsg) => {
+    // Try calling a backend endpoint `/api/chat` (adjust path as needed).
+    // Expected backend response JSON: { reply: '...' }
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: userMsg.text }),
+      });
+      if (!res.ok) throw new Error('Network response was not ok');
+      const data = await res.json();
+      // Return an object compatible with ChatWidget message format
+      return { id: Date.now(), from: 'bot', text: data.reply ?? String(data) };
+    } catch (err) {
+      console.error('sendMessageToApi error', err);
+      // Let ChatWidget handle fallback/timeout; return a fallback text to display immediately if desired
+      return { id: Date.now(), from: 'bot', text: 'Sorry, could not reach server.' };
+    }
+  };
+
+  const handleResponse = (botMsg) => {
+    // Called when a bot response is received
+    console.log('Bot response:', botMsg);
+  };
   return (
     <AuthProvider>
       <Router>
@@ -136,7 +166,7 @@ function App() {
             </Routes>
           </main>
           {/* Chat widget (global) */}
-          <ChatWidget />
+          <ChatWidget onDispatch={handleDispatch} sendMessageToApi={sendMessageToApi} onResponse={handleResponse} />
         </div>
       </Router>
     </AuthProvider>
