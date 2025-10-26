@@ -1,0 +1,115 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if service else 'Create' }} Service - Salon Admin{% endblock %}
+{% block page_title %}{{ 'Edit' if service else 'Create' }} Service{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {{ 'Edit' if service else 'Create' }} Service
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="name" class="form-label">Service Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ service.name if service else '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="type" class="form-label">Service Type *</label>
+                                <select class="form-control" id="type" name="type" required>
+                                    <option value="">Select Type</option>
+                                    {% for service_type in ServiceType %}
+                                        <option value="{{ service_type.value }}" 
+                                                {{ 'selected' if service and service.type == service_type else '' }}>
+                                            {{ service_type.value.title() }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="price" class="form-label">Price *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           step="0.01" min="0" 
+                                           value="{{ service.price if service else '' }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="duration" class="form-label">Duration (minutes) *</label>
+                                <input type="number" class="form-control" id="duration" name="duration" 
+                                       min="1" value="{{ service.duration if service else '' }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4">{{ service.description if service else '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                   {{ 'checked' if not service or service.is_active else '' }}>
+                            <label class="form-check-label" for="is_active">
+                                Active Service
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_services.services') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Services
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ 'Update' if service else 'Create' }} Service
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Service Information</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    <strong>Service Name:</strong> Enter a descriptive name for the service.
+                </p>
+                <p class="text-muted">
+                    <strong>Service Type:</strong> Choose the appropriate category for the service.
+                </p>
+                <p class="text-muted">
+                    <strong>Price:</strong> Set the price in dollars (e.g., 25.00).
+                </p>
+                <p class="text-muted">
+                    <strong>Duration:</strong> Specify how long the service takes in minutes.
+                </p>
+                <p class="text-muted">
+                    <strong>Description:</strong> Provide additional details about the service.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

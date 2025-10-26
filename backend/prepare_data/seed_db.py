@@ -9,7 +9,7 @@ import os
 import sys
 from decimal import Decimal
 from src.entry import flask_app
-from src.models import db, Salon, Staff, Service, SalonService, User, Appointment
+from src.models import db, Salon, Staff, Service, User, Appointment
 from src.models.staff import StaffRole, Seniority
 from src.models.service import ServiceType
 from src.models.user import UserRole
@@ -117,13 +117,15 @@ def map_service_data(service_data):
         'Retail': ServiceType.NAIL_CARE
     }
     
+    salon = Salon.query.first()
     # Create service data dict with only matching fields
     service_dict = {
         'name': service_data.get('name'),
         'description': f"Category: {service_data.get('category', 'Nail Care')}",
         'type': category_map.get(service_data.get('category'), ServiceType.NAIL_CARE),
         'price': Decimal(str(service_data.get('price', 0))) if service_data.get('price') else None,
-        'image_url': service_data.get('image_url')
+        'image_url': service_data.get('image_url'),
+        'salon_id': salon.id
     }
     
     # Remove None values
@@ -188,7 +190,7 @@ def create_appointment_data():
         return
 
     # October 2025 dates
-    october_2025 = date(2025, 10, 1)
+    october_2025 = date(2025, 11, 1)
     
     # Time slots (30-minute intervals from 9:00 AM to 6:00 PM)
     time_slots = [
@@ -218,8 +220,8 @@ def create_appointment_data():
     # Create appointments for the first 15 days of October 2025
     appointments_created = 0
 
-    for day in range(1, 16):  # October 1-15, 2025
-        appointment_date = date(2025, 10, day)
+    for day in range(1, 10):  # October 1-15, 2025
+        appointment_date = date(2025, 11, day)
         
         # Skip weekends (Saturday = 5, Sunday = 6)
         if appointment_date.weekday() >= 5:
@@ -268,38 +270,6 @@ def create_appointment_data():
     
     print(f"🎉 Created {appointments_created} appointments for October 2025!")
 
-def create_salon_service_relationships():
-    """Create relationships between salon and services."""
-    print("\n🌱 Creating salon-service relationships...")
-    
-    # Get the salon
-    salon = Salon.query.filter_by(name="Here Salon").first()
-    if not salon:
-        print("❌ Salon not found")
-        return
-    
-    # Get all services
-    all_services = Service.query.all()
-    
-    for service in all_services:
-        # Check if relationship already exists
-        existing_relationship = SalonService.query.filter_by(
-            salon_id=salon.id,
-            service_id=service.id
-        ).first()
-        
-        if existing_relationship:
-            continue
-        
-        try:
-            SalonService.create(
-                salon_id=salon.id,
-                service_id=service.id
-            )
-            print(f"✅ Linked {salon.name} to {service.name}")
-        except Exception as e:
-            print(f"❌ Error linking {salon.name} to {service.name}: {e}")
-
 def main():
     """Main seeding function."""
     print("🚀 Starting database seeding...")
@@ -320,9 +290,6 @@ def main():
             
             # Seed service data
             seed_services()
-            
-            # Create salon-service relationships
-            create_salon_service_relationships()
 
             # Create appointment data
             create_appointment_data()
@@ -332,7 +299,6 @@ def main():
             print(f"   - Salons: {Salon.query.count()}")
             print(f"   - Staff: {Staff.query.count()}")
             print(f"   - Services: {Service.query.count()}")
-            print(f"   - Salon-Service relationships: {SalonService.query.count()}")
             print(f"   - Users: {User.query.count()}")
             print(f"   - Admin users: {User.query.filter_by(role=UserRole.ADMIN).count()}")
             print(f"   - Manager users: {User.query.filter_by(role=UserRole.MANAGER).count()}")

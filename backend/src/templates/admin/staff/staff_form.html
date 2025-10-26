@@ -1,0 +1,130 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if staff else 'Create' }} Staff - Salon Admin{% endblock %}
+{% block page_title %}{{ 'Edit' if staff else 'Create' }} Staff{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {{ 'Edit' if staff else 'Create' }} Staff Member
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="name" class="form-label">Full Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ staff.name if staff else '' }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="role" class="form-label">Role *</label>
+                                <select class="form-control" id="role" name="role" required>
+                                    <option value="">Select Role</option>
+                                    {% for staff_role in StaffRole %}
+                                        <option value="{{ staff_role.value }}" 
+                                                {{ 'selected' if staff and staff.role == staff_role.value else '' }}>
+                                            {{ staff_role.name.title() }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="salon_id" class="form-label">Salon *</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="seniority" class="form-label">Seniority</label>
+                                <select class="form-control" id="seniority" name="seniority">
+                                    <option value="">Select Seniority</option>
+                                    {% for seniority_level in Seniority %}
+                                        <option value="{{ seniority_level.value }}" 
+                                                {{ 'selected' if staff and staff.seniority == seniority_level else '' }}>
+                                            {{ seniority_level.value.replace('_', ' ').title() }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="experience_years" class="form-label">Experience (Years)</label>
+                                <input type="number" class="form-control" id="experience_years" name="experience_years" 
+                                       min="0" max="50" value="{{ staff.experience_years if staff else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="specialization" class="form-label">Specialization</label>
+                                <input type="text" class="form-control" id="specialization" name="specialization" 
+                                       value="{{ staff.specialization if staff else '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="bio" class="form-label">Bio</label>
+                        <textarea class="form-control" id="bio" name="bio" rows="4">{{ staff.bio if staff else '' }}</textarea>
+                    </div>
+                    
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin_staff.staff') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Staff
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ 'Update' if staff else 'Create' }} Staff
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Staff Information</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    <strong>Full Name:</strong> Enter the staff member's complete name.
+                </p>
+                <p class="text-muted">
+                    <strong>Email:</strong> Contact email address for the staff member.
+                </p>
+                <p class="text-muted">
+                    <strong>Phone:</strong> Contact phone number (optional).
+                </p>
+                <p class="text-muted">
+                    <strong>Role:</strong> Select the staff member's role in the salon.
+                </p>
+                <p class="text-muted">
+                    <strong>Salon:</strong> Assign the staff member to a specific salon.
+                </p>
+                <p class="text-muted">
+                    <strong>Experience:</strong> Years of experience in the field.
+                </p>
+                <p class="text-muted">
+                    <strong>Specialization:</strong> Areas of expertise (e.g., Hair Cutting, Coloring).
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
