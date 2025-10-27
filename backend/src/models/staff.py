@@ -33,7 +33,7 @@ class Staff(BaseModel):
     # Relationships
     user = db.relationship('User', backref='staff_profile', lazy=True)
     appointments = db.relationship('Appointment', backref='staff', lazy=True)
-    working_hours = db.relationship('WorkingHour', backref='staff', lazy=True)
+    # working_hours = db.relationship('WorkingHour', backref='staff', lazy=True)
 
     def __repr__(self):
         return f'<Staff {self.name}>'

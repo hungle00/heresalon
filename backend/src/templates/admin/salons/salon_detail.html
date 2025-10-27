@@ -54,20 +54,14 @@
                         <h6>Working Hours</h6>
                         <table class="table table-borderless">
                             <tr>
-                                <td><strong>Monday - Friday:</strong></td>
-                                <td>9:00 AM - 7:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Saturday:</strong></td>
-                                <td>9:00 AM - 5:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Sunday:</strong></td>
-                                <td>10:00 AM - 4:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Lunch Break:</strong></td>
-                                <td>12:00 PM - 1:00 PM</td>
+                                <td><strong>Daily Hours:</strong></td>
+                                <td>
+                                    {% if salon.start_working_time and salon.end_working_time %}
+                                        {{ salon.start_working_time.strftime('%I:%M %p') }} - {{ salon.end_working_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">Not set</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         </table>
                     </div>

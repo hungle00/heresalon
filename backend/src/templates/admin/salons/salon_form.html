@@ -30,6 +30,55 @@
                         <textarea class="form-control" id="description" name="description" rows="4">{{ salon.description if salon else '' }}</textarea>
                     </div>
                     
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="start_working_time">Start Working Time</label>
+                                <div class="input-group">
+                                    <select class="form-control" id="start_hour" name="start_hour">
+                                        {% for hour in range(24) %}
+                                            <option value="{{ "%02d"|format(hour) }}" 
+                                                    {% if salon and salon.start_working_time and salon.start_working_time.strftime('%H') == "%02d"|format(hour) %}selected{% endif %}>
+                                                {{ "%02d"|format(hour) }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="input-group-text">:</span>
+                                    <select class="form-control" id="start_minute" name="start_minute">
+                                        <option value="00" {% if salon and salon.start_working_time and salon.start_working_time.strftime('%M') == '00' %}selected{% endif %}>00</option>
+                                        <option value="30" {% if salon and salon.start_working_time and salon.start_working_time.strftime('%M') == '30' %}selected{% endif %}>30</option>
+                                    </select>
+                                </div>
+                                <!-- Hidden input to store the combined time value -->
+                                <input type="hidden" id="start_working_time" name="start_working_time" 
+                                       value="{{ salon.start_working_time.strftime('%H:%M') if salon and salon.start_working_time else '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="end_working_time">End Working Time</label>
+                                <div class="input-group">
+                                    <select class="form-control" id="end_hour" name="end_hour">
+                                        {% for hour in range(24) %}
+                                            <option value="{{ "%02d"|format(hour) }}" 
+                                                    {% if salon and salon.end_working_time and salon.end_working_time.strftime('%H') == "%02d"|format(hour) %}selected{% endif %}>
+                                                {{ "%02d"|format(hour) }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="input-group-text">:</span>
+                                    <select class="form-control" id="end_minute" name="end_minute">
+                                        <option value="00" {% if salon and salon.end_working_time and salon.end_working_time.strftime('%M') == '00' %}selected{% endif %}>00</option>
+                                        <option value="30" {% if salon and salon.end_working_time and salon.end_working_time.strftime('%M') == '30' %}selected{% endif %}>30</option>
+                                    </select>
+                                </div>
+                                <!-- Hidden input to store the combined time value -->
+                                <input type="hidden" id="end_working_time" name="end_working_time" 
+                                       value="{{ salon.end_working_time.strftime('%H:%M') if salon and salon.end_working_time else '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> {{ 'Update' if salon else 'Create' }} Salon
@@ -43,4 +92,135 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startHourSelect = document.getElementById('start_hour');
+    const startMinuteSelect = document.getElementById('start_minute');
+    const startTimeHidden = document.getElementById('start_working_time');
+    
+    const endHourSelect = document.getElementById('end_hour');
+    const endMinuteSelect = document.getElementById('end_minute');
+    const endTimeHidden = document.getElementById('end_working_time');
+    
+    const form = document.querySelector('form');
+    
+    // Function to convert time to minutes for comparison
+    function timeToMinutes(hour, minute) {
+        return parseInt(hour) * 60 + parseInt(minute);
+    }
+    
+    // Function to validate time range
+    function validateTimeRange() {
+        const startHour = startHourSelect.value;
+        const startMinute = startMinuteSelect.value;
+        const endHour = endHourSelect.value;
+        const endMinute = endMinuteSelect.value;
+        
+        if (startHour && startMinute && endHour && endMinute) {
+            const startMinutes = timeToMinutes(startHour, startMinute);
+            const endMinutes = timeToMinutes(endHour, endMinute);
+            
+            if (startMinutes >= endMinutes) {
+                // Show error message
+                showTimeError('Start time must be earlier than end time');
+                return false;
+            } else {
+                // Clear error message
+                clearTimeError();
+                return true;
+            }
+        }
+        return true;
+    }
+    
+    // Function to show error message
+    function showTimeError(message) {
+        let errorDiv = document.getElementById('time-error');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = 'time-error';
+            errorDiv.className = 'alert alert-danger mt-2';
+            form.appendChild(errorDiv);
+        }
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+    
+    // Function to clear error message
+    function clearTimeError() {
+        const errorDiv = document.getElementById('time-error');
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+    }
+    
+    // Function to update hidden input with combined time value
+    function updateTimeValue(hourSelect, minuteSelect, hiddenInput) {
+        const hour = hourSelect.value;
+        const minute = minuteSelect.value;
+        
+        if (hour && minute) {
+            hiddenInput.value = hour + ':' + minute;
+        } else {
+            hiddenInput.value = '';
+        }
+        
+        // Validate time range after update
+        validateTimeRange();
+    }
+    
+    // Add event listeners for start time
+    if (startHourSelect) {
+        startHourSelect.addEventListener('change', function() {
+            updateTimeValue(startHourSelect, startMinuteSelect, startTimeHidden);
+        });
+    }
+    
+    if (startMinuteSelect) {
+        startMinuteSelect.addEventListener('change', function() {
+            updateTimeValue(startHourSelect, startMinuteSelect, startTimeHidden);
+        });
+    }
+    
+    // Add event listeners for end time
+    if (endHourSelect) {
+        endHourSelect.addEventListener('change', function() {
+            updateTimeValue(endHourSelect, endMinuteSelect, endTimeHidden);
+        });
+    }
+    
+    if (endMinuteSelect) {
+        endMinuteSelect.addEventListener('change', function() {
+            updateTimeValue(endHourSelect, endMinuteSelect, endTimeHidden);
+        });
+    }
+    
+    // Handle form submission - ensure hidden inputs are updated before submit
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Update hidden inputs one more time before submission
+            updateTimeValue(startHourSelect, startMinuteSelect, startTimeHidden);
+            updateTimeValue(endHourSelect, endMinuteSelect, endTimeHidden);
+            
+            // Validate time range before submission
+            if (!validateTimeRange()) {
+                e.preventDefault(); // Prevent form submission
+                return false;
+            }
+            
+            // Remove the individual hour/minute inputs from form data
+            // so backend only receives the combined time values
+            if (startHourSelect) startHourSelect.disabled = true;
+            if (startMinuteSelect) startMinuteSelect.disabled = true;
+            if (endHourSelect) endHourSelect.disabled = true;
+            if (endMinuteSelect) endMinuteSelect.disabled = true;
+        });
+    }
+    
+    // Initialize values on page load
+    updateTimeValue(startHourSelect, startMinuteSelect, startTimeHidden);
+    updateTimeValue(endHourSelect, endMinuteSelect, endTimeHidden);
+});
+</script>
 {% endblock %}
