@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Appointments - Salon Admin{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Appointments</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Staff</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.id }}</td>
+                        <td>{{ appointment.user.username if appointment.user else 'N/A' }}</td>
+                        <td>{{ appointment.staff.name if appointment.staff else 'N/A' }}</td>
+                        <td>{{ appointment.service.name if appointment.service else 'N/A' }}</td>
+                        <td>{{ appointment.date.strftime('%Y-%m-%d') if appointment.date else 'N/A' }}</td>
+                        <td>
+                            {% if appointment.start_time and appointment.end_time %}
+                                {{ appointment.start_time.strftime('%H:%M') }} - {{ appointment.end_time.strftime('%H:%M') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge bg-{{ 'warning' if appointment.status.value == 'pending' else 'success' if appointment.status.value == 'confirmed' else 'info' if appointment.status.value == 'in_progress' else 'secondary' if appointment.status.value == 'completed' else 'danger' }}">
+                                {{ appointment.status.value.title() }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin_appointments.view', appointment_id=appointment.id) }}" 
+                               class="btn btn-sm btn-info me-1">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            {% if current_user and current_user.role != UserRole.ADMIN %}
+                            <!-- Admin cannot edit appointments, only view -->
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

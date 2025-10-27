@@ -181,9 +181,17 @@ const ChatWidget = ({ onDispatch, sendMessageToApi, onResponse }) => {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message..."
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
-                  className="flex-1 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500"
+                  className={`flex-1 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 ${awaitingResponse ? 'opacity-60 cursor-not-allowed' : ''}`}
+                  disabled={awaitingResponse}
                 />
-                <button onClick={handleSend} className="bg-pink-600 text-white px-3 py-2 rounded-md text-sm">Send</button>
+                <button
+                  onClick={handleSend}
+                  className={`bg-pink-600 text-white px-3 py-2 rounded-md text-sm ${awaitingResponse ? 'opacity-60 cursor-not-allowed' : 'hover:bg-pink-700'}`}
+                  disabled={awaitingResponse}
+                  title={awaitingResponse ? 'Waiting for bot response...' : 'Send message'}
+                >
+                  {awaitingResponse ? 'Waiting...' : 'Send'}
+                </button>
               </div>
             </div>
           </div>

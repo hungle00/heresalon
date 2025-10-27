@@ -12,7 +12,7 @@ class Salon(BaseModel):
 
     # Relationships
     staffs = db.relationship('Staff', backref='salon', lazy=True)
-    salon_services = db.relationship('SalonService', backref='salon', lazy=True)
+    services = db.relationship('Service', backref='salon', lazy=True)
 
     def __repr__(self):
         return f'<Salon {self.name}>'
@@ -24,5 +24,7 @@ class Salon(BaseModel):
             'name': self.name,
             'address': self.address,
             'description': self.description,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'staff_count': len(self.staffs) if self.staffs else 0,
+            'services_count': len(self.services) if self.services else 0
         }

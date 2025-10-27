@@ -1,0 +1,46 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ 'Edit' if salon else 'Add' }} Salon - Salon Admin{% endblock %}
+{% block page_title %}{{ 'Edit' if salon else 'Add' }} Salon{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {{ 'Edit' if salon else 'Add' }} Salon Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="form-group mb-3">
+                        <label for="name">Salon Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ salon.name if salon else '' }}" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="address">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3">{{ salon.address if salon else '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="description">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4">{{ salon.description if salon else '' }}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {{ 'Update' if salon else 'Create' }} Salon
+                        </button>
+                        <a href="{{ url_for('admin_salons.salons') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Salons
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
