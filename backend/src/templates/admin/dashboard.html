@@ -4,7 +4,7 @@
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-{% if current_user.role == UserRole.ADMIN %}
+{% if current_user.is_admin %}
 <!-- Admin Dashboard - General Stats -->
 <div class="row">
     <div class="col-xl-3 col-md-6 mb-4">
@@ -184,7 +184,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% if current_user.role == UserRole.ADMIN %}
+                    {% if current_user.is_admin %}
                     <div class="col-sm-6">
                         <div class="text-center">
                             <div class="h3 text-warning">{{ stats.pending_appointments }}</div>
@@ -223,7 +223,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    {% if current_user.role == UserRole.ADMIN %}
+                    {% if current_user.is_admin %}
                     <div class="col-sm-6 mb-3">
                         <a href="{{ url_for('admin_users.new_user') }}" class="btn btn-primary btn-block">
                             <i class="fas fa-user-plus"></i> Add User

@@ -28,7 +28,7 @@ def index():
     search = request.args.get('search', '')
     
     # Build query based on user role
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         # Admin sees all appointments
         query = Appointment.query.join(Staff).outerjoin(User).join(Service)
     else:
@@ -70,7 +70,7 @@ def index():
     appointments = query.all()
     
     # Get filter options based on user role
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         staffs = Staff.query.all()
     else:
         staffs = Staff.query.filter_by(salon_id=current_user.salon_id).all()

@@ -52,9 +52,9 @@ class User(BaseModel):
 
     def validate_salon_assignment(self):
         """Validate that only managers can have salon_id"""
-        if self.role == UserRole.MANAGER and self.salon_id is None:
+        if self.is_manager and self.salon_id is None:
             raise ValueError("Manager must be assigned to a salon")
-        if self.role != UserRole.MANAGER and self.salon_id is not None:
+        if not self.is_manager and self.salon_id is not None:
             raise ValueError("Only managers can be assigned to a salon")
         return True
 

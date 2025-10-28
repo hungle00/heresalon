@@ -22,7 +22,7 @@ def salon_detail(salon_id):
     salon = Salon.query.get_or_404(salon_id)
     
     current_user = User.query.filter_by(username=session.get('admin_username')).first()
-    if current_user and current_user.role == UserRole.MANAGER:
+    if current_user and current_user.is_manager:
         if current_user.salon_id != salon_id:
             abort(403)  # Forbidden - manager can only view their own salon
     
@@ -35,7 +35,7 @@ def edit_salon(salon_id):
     salon = Salon.query.get_or_404(salon_id)
     
     current_user = User.query.filter_by(username=session.get('admin_username')).first()
-    if current_user and current_user.role == UserRole.MANAGER:
+    if current_user and current_user.is_manager:
         if current_user.salon_id != salon_id:
             abort(403)  # Forbidden - manager can only edit their own salon
     

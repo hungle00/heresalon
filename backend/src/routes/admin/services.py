@@ -24,7 +24,7 @@ def services():
     max_price = request.args.get('max_price', type=float)
     
     # Build query based on user role
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         # Admin sees all services
         query = Service.query
     else:
@@ -66,7 +66,7 @@ def new_service():
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can create services
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can create services!', 'error')
         return redirect(url_for('admin_services.services'))
     
@@ -108,7 +108,7 @@ def edit_service(service_id):
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can edit services
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can edit services!', 'error')
         return redirect(url_for('admin_services.services'))
     
@@ -153,7 +153,7 @@ def delete_service(service_id):
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can delete services
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can delete services!', 'error')
         return redirect(url_for('admin_services.services'))
     

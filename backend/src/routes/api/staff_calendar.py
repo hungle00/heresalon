@@ -61,13 +61,6 @@ def get_staff_appointments(staff_id):
     for appointment in appointments:
         appointment_dict = appointment.to_dict()
         
-        # Add staff information
-        # appointment_dict['staff'] = {
-        #     'id': staff.id,
-        #     'name': staff.name,
-        #     'role': staff.role
-        # }
-        
         # Add service information
         service = Service.get(id=appointment.service_id)
         if service:
@@ -97,4 +90,11 @@ def get_staff_appointments(staff_id):
         'appointments': result
     })
 
-
+def get_available_time_slots(staff_id, date):
+    """Get available time slots for a specific staff member on a specific date"""
+    staff = Staff.get(id=staff_id)
+    if not staff:
+        return jsonify({'error': 'Staff member not found'}), 404
+    
+    available_time_slots = AvailabilityService.get_available_time_slots(staff_id, date)
+    return jsonify(available_time_slots)
