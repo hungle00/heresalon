@@ -13,7 +13,7 @@ def dashboard():
     # Get current user
     current_user = User.get(id=session['admin_id'])
     
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         # Admin sees general stats
         stats = {
             'total_users': User.query.count(),

@@ -4,11 +4,12 @@ from datetime import datetime, date
 
 from src.models import Appointment, Staff, Service, User
 from src.models.appointment import AppointmentStatus
+from src.services.availability_service import AvailabilityService
 
 blueprint = Blueprint('calendar', __name__, url_prefix='/api')
 
 @blueprint.route('/staffs/<int:staff_id>/appointments/', methods=['GET'])
-def get_staff_appointments(staff_id):
+def get_appointments(staff_id):
     """Get all appointments for a specific staff member with optional month filter"""
     
     # Check if staff exists
@@ -61,13 +62,6 @@ def get_staff_appointments(staff_id):
     for appointment in appointments:
         appointment_dict = appointment.to_dict()
         
-        # Add staff information
-        # appointment_dict['staff'] = {
-        #     'id': staff.id,
-        #     'name': staff.name,
-        #     'role': staff.role
-        # }
-        
         # Add service information
         service = Service.get(id=appointment.service_id)
         if service:
@@ -97,4 +91,38 @@ def get_staff_appointments(staff_id):
         'appointments': result
     })
 
-
+@blueprint.route('/staffs/<int:staff_id>/available-time-slots/', methods=['GET'])
+def get_available_time_slots(staff_id):
+    """Get available time slots for a specific staff member on a specific date"""
+    # Check if staff exists
+    staff = Staff.get(id=staff_id)
+    if not staff:
+        return jsonify({'error': 'Staff member not found'}), 404
+    
+    # Get date parameter from query string
+    date_str = request.args.get('date')
+    if not date_str:
+        return jsonify({'error': 'Date parameter is required'}), 400
+    
+    try:
+        # Parse date string (expected format: YYYY-MM-DD)
+        appointment_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+    
+    # Get optional parameters
+    service_duration = request.args.get('service_duration', 60, type=int)
+    
+    # Get available time slots
+    available_time_slots = AvailabilityService.get_available_time_slots(
+        staff_id=staff_id,
+        appointment_date=appointment_date,
+        service_duration_minutes=service_duration
+    )
+    
+    return jsonify({
+        'staff_id': staff_id,
+        'date': appointment_date.isoformat(),
+        'available_slots': available_time_slots,
+        'total_slots': len(available_time_slots)
+    })

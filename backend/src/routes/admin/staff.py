@@ -20,7 +20,7 @@ def staff():
     search = request.args.get('search')
     
     # Build query based on user role
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         # Admin can see all staff
         staff_members = Staff.query
         salons = Salon.query.all()
@@ -51,7 +51,7 @@ def new_staff():
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can create staff
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can create staff members!', 'error')
         return redirect(url_for('admin_staff.staff'))
     
@@ -103,7 +103,7 @@ def edit_staff(staff_id):
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can edit staff
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can edit staff members!', 'error')
         return redirect(url_for('admin_staff.staff'))
     
@@ -158,7 +158,7 @@ def delete_staff(staff_id):
     current_user = User.get(id=session['admin_id'])
     
     # Only managers can delete staff
-    if current_user.role == UserRole.ADMIN:
+    if current_user.is_admin:
         flash('Only managers can delete staff members!', 'error')
         return redirect(url_for('admin_staff.staff'))
     

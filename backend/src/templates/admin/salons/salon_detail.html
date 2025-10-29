@@ -9,7 +9,7 @@
         <a href="{{ url_for('admin_salons.salons') }}" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left"></i> Back to Salons
         </a>
-        {% if current_user and current_user.role == UserRole.ADMIN %}
+        {% if current_user and current_user.is_admin %}
         <a href="{{ url_for('admin_salons.edit_salon', salon_id=salon.id) }}" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit Salon
         </a>
@@ -54,20 +54,14 @@
                         <h6>Working Hours</h6>
                         <table class="table table-borderless">
                             <tr>
-                                <td><strong>Monday - Friday:</strong></td>
-                                <td>9:00 AM - 7:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Saturday:</strong></td>
-                                <td>9:00 AM - 5:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Sunday:</strong></td>
-                                <td>10:00 AM - 4:00 PM</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Lunch Break:</strong></td>
-                                <td>12:00 PM - 1:00 PM</td>
+                                <td><strong>Daily Hours:</strong></td>
+                                <td>
+                                    {% if salon.start_working_time and salon.end_working_time %}
+                                        {{ salon.start_working_time.strftime('%I:%M %p') }} - {{ salon.end_working_time.strftime('%I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">Not set</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         </table>
                     </div>
@@ -124,7 +118,7 @@
                 <div class="text-center text-muted">
                     <i class="fas fa-user-tie fa-3x mb-3"></i>
                     <p>No staff members assigned to this salon yet.</p>
-                    {% if current_user and current_user.role == UserRole.MANAGER %}
+                    {% if current_user and current_user.is_manager %}
                     <a href="{{ url_for('admin_staff.new_staff') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Staff Member
                     </a>
@@ -181,7 +175,7 @@
                 <div class="text-center text-muted">
                     <i class="fas fa-cogs fa-3x mb-3"></i>
                     <p>No services available for this salon yet.</p>
-                    {% if current_user and current_user.role == UserRole.MANAGER %}
+                    {% if current_user and current_user.is_manager %}
                     <a href="{{ url_for('admin_services.new_service') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Service
                     </a>
